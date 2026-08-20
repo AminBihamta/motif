@@ -1,16 +1,47 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Jost, Bodoni_Moda, Lobster_Two, Elsie, Rubik_Spray_Paint, Jacquarda_Bastarda_9, Dancing_Script } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const bodoniModa = Bodoni_Moda({
+  variable: "--font-bodoni-moda",
   subsets: ["latin"],
 });
+
+const elsie = Elsie({
+  weight: ["400", "900"],
+  subsets: ["latin"],
+  variable: "--font-elsie",
+});
+
+const rubikSprayPaint = Rubik_Spray_Paint({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-rubik-spray-paint",
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing-script",
+});
+
+const jacquardaBastarda9 = Jacquarda_Bastarda_9({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-jacquarda-bastarda-9",
+});
+
+const lobsterTwo = Lobster_Two({
+  variable: "--font-lobster-two",
+  subsets: ["latin"],
+  weight: "700"
+});
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${jost.variable} ${bodoniModa.variable} ${lobsterTwo.variable} ${elsie.variable} ${rubikSprayPaint.variable} ${jacquardaBastarda9.variable} ${dancingScript.variable}  h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
