@@ -1,4 +1,5 @@
 import Form from "next/form";
+import Link from "next/link";
 
 export default function SignIn() {
   return (
@@ -21,9 +22,9 @@ export default function SignIn() {
             type="password"
             placeholder="12345678"
           ></input>
-          <button className="border rounded-lg px-4 py-2 w-fit" type="submit">
+          <Link href="/find-my-vibe" className="border rounded-lg px-4 py-2 w-fit" type="submit">
             Sign in
-          </button>
+          </Link>
         </Form>
       </main>
     </div>
