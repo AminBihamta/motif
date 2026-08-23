@@ -1,6 +1,8 @@
-import Link from "next/link";
+import CustomLink from "./components/CustomLink";
 import Image from "next/image";
 import { Play, Running } from "iconoir-react";
+import AnimatedContainer from "./components/animated-container";
+
 
 export default function Home() {
   const rowImages1 = [
@@ -59,7 +61,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex w-full h-screen overflow-x-hidden">
+<AnimatedContainer>
       <main className="w-full h-full flex justify-between items-center flex-col pt-50">
         <div className="flex flex-col">
           <h1 className="text-9xl text-center font-light">
@@ -69,12 +71,13 @@ export default function Home() {
 
           <h2 className="text-2xl text-center mt-35">Your vibe finder</h2>
           <Image
-            className="absolute top-[-150] right-[-250]"
+            className="absolute top-[-150] right-[-250] z-1"
             src="/assets/persian-rug-1.png"
             width={700}
             height={200}
             alt="Persian Rug"
           />
+
           <Image
             className="absolute top-[50] left-[50]"
             src="/assets/star.png"
@@ -93,34 +96,19 @@ export default function Home() {
           />
 
           <Image
-            className="absolute bottom-[10vh] left-[-300]"
+            className="absolute bottom-[10vh] left-[-300] z-1"
             src="/assets/persian-rug-flower-transparent.png"
             width={600}
             height={600}
             alt="Star"
           />
-
           <div className="flex w-fill justify-center gap-4 mt-10 ">
-            <Link
-              className="border px-4 py-2 rounded-lg text-sm hover:text-motif-charcoal hover:bg-motif-ivory flex flex-row gap-1 justify-center items-center transition-colors duration-300 ease-in-out hover:border-motif-ivory hover:animate-[gap-pulse_1s_ease-in-out_infinite]"
-              href="/demo"
-            >
-              Watch a demo
-              <Play />
-
-            </Link>
-            <Link
-              className="border px-4 py-2 rounded-lg text-sm bg-motif-red border-motif-red hover:bg-motif-ivory hover:text-motif-red flex flex-row justify-center items-center gap-1 transition-colors duration-300 ease-in-out hover:border-motif-ivory hover:animate-[gap-pulse_1s_ease-in-out_infinite]"
-              href="/signin"
-            >
-              Find my vibe
-              <Running />
-
-            </Link>
+            <CustomLink theme="cream" label="Watch a demo" icon={Play} link="signin"/>
+            <CustomLink theme="red" label="Give it a try" icon={Running} link="signin"/>
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-2 overflow-hidden">
+        <div className="flex w-full flex-col gap-2 overflow-hidden z-2">
           <div className="flex w-max shrink-0 gap-2 scroll-left">
             {[...rowImages1, ...rowImages1].map((src, i) => (
               <Image
@@ -148,6 +136,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-    </div>
+</AnimatedContainer>
   );
 }

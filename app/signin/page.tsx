@@ -1,10 +1,14 @@
 import Form from "next/form";
 import Link from "next/link";
+import AnimatedContainer from "../components/animated-container";
 
 export default function SignIn() {
   return (
-    <div className="w-screen h-screen">
-      <main className="flex w-full h-full justify-center items-center flex-col">
+    <AnimatedContainer bgSource="/assets/sign-in-bg.png">
+      <main className="flex w-[50%] h-full justify-center items-center flex-col">
+        <div className="flex flex-col justify-center items-center">
+        <span className=" font-bold text-4xl text-center elsie]">Motif</span>
+
         <h1 className="text-center text-4xl">Sign in to find your vibe</h1>
         <Form
           action="/signin"
@@ -25,8 +29,9 @@ export default function SignIn() {
           <Link href="/find-my-vibe" className="border rounded-lg px-4 py-2 w-fit" type="submit">
             Sign in
           </Link>
-        </Form>
+          </Form>
+        </div>
       </main>
-    </div>
+    </AnimatedContainer>
   );
 }
