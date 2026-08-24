@@ -6,17 +6,29 @@ interface LinkProps {
   label: string;
   icon: React.ComponentType;
   link: string;
+  icon_left: boolean;
 }
 
 
-export default function CustomLink({theme, label, icon: Icon, link}: LinkProps) {
+export default function CustomLink({theme, label, icon_left, icon: Icon, link}: LinkProps) {
     return (
       <Link
-        className={`border px-4 py-2 rounded-lg text-sm hover:text-motif-charcoal hover:bg-motif-ivory flex flex-row gap-1 justify-center items-center transition-colors duration-300 ease-in-out hover:border-motif-ivory hover:animate-[gap-pulse_1s_ease-in-out_infinite] ${theme === "cream" ? "bg-transparent" : "bg-motif-red border-motif-red hover:text-motif-red"}`}
+        className={`border px-4 py-2 cursor-pointer rounded-lg text-sm hover:text-motif-charcoal  flex flex-row gap-1 justify-center items-center transition-colors duration-300 ease-in-out hover:border-motif-ivory hover:animate-[gap-pulse_1s_ease-in-out_infinite] ${theme === "cream" ? "hover:bg-motif-ivory bg-transparent" : ""} ${theme === "red" ? "hover:bg-motif-ivory bg-motif-red border-motif-red hover:text-motif-red" : ""} ${theme === "charcol" ? "text-motif-charcoal hover:text-motif-ivory border-motif-charcoal hover:bg-motif-charcoal hover:border-motif-charcoal bg-motif-charcol border-motif-charcol hover:text-motif-charcol" : ""}`}
         href={link}
       >
-        {label}
-        <Icon />
+
+        {icon_left ? (
+          <>
+            {<Icon />}
+            {label}
+          </>
+        ) : (
+            <>
+              {label}
+              {<Icon />}
+
+            </>
+        )}
       </Link>
     )
 }
