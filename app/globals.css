@@ -165,3 +165,12 @@ body {
     gap: 0.5rem;
   }
 }
+
+
+.popup-enabled {
+    display: block;
+}
+
+.popup-disabled {
+    display: none;
+}

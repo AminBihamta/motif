@@ -17,7 +17,7 @@ export default function SignIn() {
           <span className="text-motif-charcoal mb-10 mt-2">Sign in to continue discovering</span>
 
           <Link
-            className={`border px-4 py-2 cursor-pointer rounded-lg text-sm hover:text-motif-charcoal  flex flex-row gap-1 justify-center items-center transition-colors duration-300 ease-in-out hover:border-motif-ivory hover:animate-[gap-pulse_1s_ease-in-out_infinite] text-motif-charcoal hover:text-motif-ivory border-motif-charcoal hover:bg-motif-charcoal hover:border-motif-charcoal bg-motif-charcol border-motif-charcol hover:text-motif-charcol w-full gap-2`}
+            className={`border px-4 py-2 cursor-pointer rounded-lg text-sm  flex flex-row justify-center items-center transition-colors duration-300 ease-in-out hover:animate-[gap-pulse_1s_ease-in-out_infinite] text-motif-charcoal hover:text-motif-ivory border-motif-charcoal hover:bg-motif-charcoal hover:border-motif-charcoal bg-motif-charcol border-motif-charcol hover:text-motif-charcol w-full gap-2`}
             href=""
           >
 

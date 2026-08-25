@@ -1,8 +1,8 @@
 import CustomLink from "./components/CustomLink";
 import Image from "next/image";
-import { Play, Running } from "iconoir-react";
+import { Running } from "iconoir-react";
 import AnimatedContainer from "./components/animated-container";
-
+import Popup from "./components/popup";
 
 export default function Home() {
   const rowImages1 = [
@@ -61,13 +61,13 @@ export default function Home() {
   ];
 
   return (
-<AnimatedContainer>
+    <AnimatedContainer>
       <main className="w-full h-full flex justify-between items-center flex-col pt-50">
         <div className="flex flex-col">
-          <h1 className="text-9xl text-center font-light">
-            Welcome to
+          <h1 className="text-9xl text-center font-light">Welcome to</h1>
+          <h1 className="font-animation font-bold absolute text-9xl text-center left-1/2 -translate-x-1/2 translate-y-32">
+            Motif
           </h1>
-          <h1 className="font-animation font-bold absolute text-9xl text-center left-1/2 -translate-x-1/2 translate-y-32">Motif</h1>
 
           <h2 className="text-2xl text-center mt-35">Your vibe finder</h2>
           <Image
@@ -103,8 +103,13 @@ export default function Home() {
             alt="Star"
           />
           <div className="flex w-fill justify-center gap-4 mt-10 ">
-            <CustomLink theme="cream" label="Watch a demo" icon={Play} link="signin"/>
-            <CustomLink theme="red" label="Give it a try" icon={Running} link="signin"/>
+            <Popup/>
+            <CustomLink
+              theme="red"
+              label="Give it a try"
+              icon={Running}
+              link="find-my-vibe"
+            />
           </div>
         </div>
 
@@ -136,6 +141,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-</AnimatedContainer>
+    </AnimatedContainer>
   );
 }

@@ -6,7 +6,7 @@ interface LinkProps {
   label: string;
   icon: React.ComponentType;
   link: string;
-  icon_left: boolean;
+  icon_left?: boolean;
   custom_className?: string;
 }
 
