@@ -62,16 +62,16 @@ export default function Home() {
 
   return (
     <AnimatedContainer>
-      <main className="w-full h-full flex justify-between items-center flex-col pt-50">
+      <main className="w-full h-full flex justify-center md:justify-start items-center flex-col md:pt-50">
         <div className="flex flex-col">
-          <h1 className="text-9xl text-center font-light">Welcome to</h1>
-          <h1 className="font-animation font-bold absolute text-9xl text-center left-1/2 -translate-x-1/2 translate-y-32">
+          <h1 className="text-6xl md:text-9xl text-center font-light">Welcome to</h1>
+          <h1 className="font-animation font-bold absolute text-6xl md:text-9xl text-center left-1/2 -translate-x-1/2 translate-y-16 md:translate-y-32">
             Motif
           </h1>
 
-          <h2 className="text-2xl text-center mt-35">Your vibe finder</h2>
+          <h2 className="text-md md:text-2xl text-center mt-20 md:mt-40">Your vibe finder</h2>
           <Image
-            className="absolute top-[-150] right-[-250] z-1"
+            className="absolute top-[-150] right-[-250] z-1 md:block hidden"
             src="/assets/persian-rug-1.png"
             width={700}
             height={200}
@@ -79,7 +79,7 @@ export default function Home() {
           />
 
           <Image
-            className="absolute top-[50] left-[50]"
+            className="absolute md:top-[50] md:left-[50] top-60 left-2 w-40"
             src="/assets/star.png"
             width={300}
             height={200}
@@ -87,7 +87,7 @@ export default function Home() {
             id="rotating-star"
           />
           <Image
-            className="absolute bottom-[30vh] right-[-100]"
+            className="absolute md:bottom-[30vh] right-[-130] md:right-[-100] md:w-75 md:h-75 w-60 bottom-[10vh]"
             src="/assets/cd.png"
             width={300}
             height={200}
@@ -96,14 +96,14 @@ export default function Home() {
           />
 
           <Image
-            className="absolute bottom-[10vh] left-[-300] z-1"
+            className="absolute md:bottom-[10vh] bottom-[5vh] md:left-[-300] left-[-150] z-1 w-75 h-75 md:w-75 md:h-75 "
             src="/assets/persian-rug-flower-transparent.png"
             width={600}
             height={600}
             alt="Star"
           />
           <div className="flex w-fill justify-center gap-4 mt-10 ">
-            <Popup/>
+            <Popup />
             <CustomLink
               theme="red"
               label="Give it a try"
@@ -113,8 +113,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex w-full flex-col gap-2 overflow-hidden z-2">
-          <div className="flex w-max shrink-0 gap-2 scroll-left">
+        <div className="flex w-full flex-col gap-2 overflow-hidden z-2 absolute top-0 md:hidden">
+          <div className=" w-max shrink-0 gap-2 scroll-left flex">
             {[...rowImages1, ...rowImages1].map((src, i) => (
               <Image
                 key={i}
@@ -127,7 +127,35 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="flex w-max shrink-0 gap-2 scroll-right">
+          <div className="flex w-max shrink-0 gap-2 scroll-right hidden md:flex">
+            {[...rowImages2, ...rowImages2].map((src, i) => (
+              <Image
+                key={i}
+                src={src}
+                alt="Placeholder"
+                width={200}
+                height={200}
+                className="row-image size-56 shrink-0 rounded-lg object-cover"
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex w-full flex-col gap-2 overflow-hidden z-2 absolute bottom-0">
+          <div className=" w-max shrink-0 gap-2 scroll-left hidden md:flex">
+            {[...rowImages1, ...rowImages1].map((src, i) => (
+              <Image
+                key={i}
+                src={src}
+                alt="Placeholder"
+                width={200}
+                height={200}
+                className="row-image size-56 shrink-0 rounded-lg object-cover"
+              />
+            ))}
+          </div>
+
+          <div className="flex w-max shrink-0 gap-2 scroll-right ">
             {[...rowImages2, ...rowImages2].map((src, i) => (
               <Image
                 key={i}
