@@ -8,7 +8,7 @@ export default function SignIn() {
     <AnimatedContainer bgSource="/assets/sign-in-bg.png">
       <main className="flex md:w-[50%] h-full justify-center items-center flex-col p-2">
         <div className="flex flex-col justify-center items-center bg-motif-ivory rounded-2xl w-full p-10">
-          <span className=" font-bold text-2xl md:text-4xl text-center elsie] text-motif-charcoal">
+          <span className=" font-bold text-2xl md:text-4xl text-center elsie] text-motif-charcoal">hidden md:flex
             Motif
           </span>
           <h1 className="text-center text-4xl md:text-6xl text-motif-charcoal">
