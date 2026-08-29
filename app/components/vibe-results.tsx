@@ -1,4 +1,4 @@
-import { ArrowRight, Refresh, Search } from "iconoir-react";
+import { ArrowRight, Refresh } from "iconoir-react";
 import Link from "next/link";
 import type { TasteProfile } from "../lib/taste-profile";
 import { InsightRow, Reveal, TactileTag } from "./motion-elements";
@@ -67,7 +67,6 @@ export default function VibeResults({
             giving
             <span className="bodoniModa relative mt-4 block w-fit max-w-full rotate-[-1deg] bg-motif-red px-3 pb-3 pt-1 font-normal normal-case leading-[0.82] tracking-[-0.06em] text-motif-ivory sm:px-5">
               {analysis.vibeName}
-              <span aria-hidden="true" className="absolute -bottom-3 -right-3 size-6 bg-motif-blue" />
             </span>
           </h1>
 
@@ -170,66 +169,6 @@ export default function VibeResults({
           ))}
         </ol>
       </section>
-
-      <Reveal className="relative mt-24 border-2 border-motif-black bg-motif-blue p-5 text-motif-ivory shadow-[12px_12px_0_var(--color-motif-red)] sm:mt-36 sm:p-10 lg:p-14">
-        <span className="absolute -right-3 -top-5 rotate-3 border-2 border-motif-black bg-motif-ivory px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-motif-black">
-          Coming soon-ish
-        </span>
-        <div className="grid gap-10 lg:grid-cols-2 lg:items-end">
-          <div>
-            <p className="mb-4 text-xs font-black uppercase tracking-[0.26em] text-motif-ivory/65">
-              Taste → Object
-            </p>
-            <h2 className="text-5xl font-black uppercase leading-[0.82] tracking-[-0.06em] sm:text-7xl">
-              Find things
-              <span className="bodoniModa block font-normal italic text-motif-ivory">
-                that get you.
-              </span>
-            </h2>
-            <p className="mt-6 max-w-lg border-l-4 border-motif-red pl-4 leading-7 text-motif-ivory/80">
-              Search for a chair, jacket, lamp—anything. Motif will use your
-              visual profile to cut through the generic stuff.
-            </p>
-          </div>
-
-          <div>
-            <label
-              htmlFor="taste-search"
-              className="mb-3 block text-xs font-black uppercase tracking-[0.18em]"
-            >
-              What are we hunting for?
-            </label>
-            <div className="flex flex-col gap-3">
-              <div className="relative">
-                <Search
-                  aria-hidden="true"
-                  className="absolute left-4 top-1/2 size-6 -translate-y-1/2 text-motif-black"
-                />
-                <input
-                  id="taste-search"
-                  type="text"
-                  defaultValue={analysis.searchQuery}
-                  placeholder="Chair, jacket, lamp..."
-                  disabled
-                  aria-describedby="search-status"
-                  className="w-full border-2 border-motif-black bg-motif-ivory py-4 pl-13 pr-5 text-lg font-bold text-motif-black opacity-90 outline-none"
-                />
-              </div>
-              <button
-                type="button"
-                disabled
-                className="inline-flex cursor-not-allowed items-center justify-between border-2 border-motif-black bg-motif-red px-5 py-4 font-black uppercase tracking-[0.12em] text-motif-ivory opacity-75"
-              >
-                Search my style
-                <ArrowRight aria-hidden="true" className="size-6" />
-              </button>
-            </div>
-            <p id="search-status" className="mt-3 text-xs font-bold uppercase tracking-[0.12em] text-motif-ivory/60">
-              Product matching is currently being connected.
-            </p>
-          </div>
-        </div>
-      </Reveal>
     </div>
   );
 }

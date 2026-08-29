@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
@@ -14,6 +14,18 @@ const uploadSlots = Array.from({ length: REQUIRED_IMAGE_COUNT });
 const initialState: AnalyzeImagesState = { status: "idle" };
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
 const maxFileSize = 5 * 1024 * 1024;
+const loadingMessages = [
+  "Reading the room...",
+  "Connecting suspiciously tasteful dots...",
+  "Interrogating your color choices...",
+  "Consulting the imaginary mood-board council...",
+  "Separating the iconic from the ironic...",
+  "Measuring your tolerance for beige...",
+  "Finding the plot in your Pinterest energy...",
+  "Checking whether the lamp is the main character...",
+  "Translating vibes into actual words...",
+  "Almost done. Dramatic pause included...",
+];
 
 export default function UploadForm() {
   const router = useRouter();
@@ -26,7 +38,20 @@ export default function UploadForm() {
   );
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dropError, setDropError] = useState<string | null>(null);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const uploadedCount = previews.filter(Boolean).length;
+
+  useEffect(() => {
+    if (!pending) return;
+
+    const interval = window.setInterval(() => {
+      setLoadingMessageIndex((current) =>
+        (current + 1) % loadingMessages.length,
+      );
+    }, reduceMotion ? 3000 : 3000);
+
+    return () => window.clearInterval(interval);
+  }, [pending, reduceMotion]);
 
   useEffect(() => {
     if (state.status !== "success" || hasNavigated.current) return;
@@ -228,9 +253,76 @@ export default function UploadForm() {
         })}
       </div>
 
-      <button type="submit" disabled={pending || uploadedCount !== REQUIRED_IMAGE_COUNT} className="group mt-5 flex w-full items-center justify-between border-2 border-motif-ivory bg-motif-red px-5 py-4 text-sm font-black uppercase tracking-[0.14em] shadow-[6px_6px_0_var(--color-motif-blue)] transition-all hover:bg-motif-ivory hover:text-motif-red disabled:cursor-not-allowed disabled:bg-motif-black disabled:text-motif-taupe disabled:opacity-60 disabled:shadow-none">
-        <span>{pending ? "Reading the room..." : "Decode my taste"}</span>
-        <ArrowRight aria-hidden="true" className="size-6 transition-transform group-hover:translate-x-1 group-disabled:translate-x-0 motion-reduce:transition-none" />
+      <button type="submit" disabled={pending || uploadedCount !== REQUIRED_IMAGE_COUNT} className={`group relative mt-5 flex min-h-[3.75rem] w-full items-center justify-between overflow-hidden border-2 border-motif-ivory px-5 py-4 text-left text-sm font-black uppercase tracking-[0.14em] transition-all ${pending ? "cursor-wait bg-motif-black text-motif-ivory shadow-[6px_6px_0_var(--color-motif-red)]" : "bg-motif-red shadow-[6px_6px_0_var(--color-motif-blue)] hover:bg-motif-ivory hover:text-motif-red disabled:cursor-not-allowed disabled:bg-motif-black disabled:text-motif-taupe disabled:opacity-60 disabled:shadow-none"}`}>
+        {pending && (
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-18deg] bg-gradient-to-r from-transparent via-motif-blue/45 to-transparent"
+            animate={reduceMotion ? undefined : { x: ["0%", "410%"] }}
+            transition={{ duration: 1.35, repeat: Infinity, ease: "linear" }}
+          />
+        )}
+
+        <span className="relative z-10 min-w-0 pr-4">
+          {pending ? (
+            <>
+              <span className="sr-only" aria-live="polite">
+                {loadingMessages[loadingMessageIndex]}
+              </span>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={loadingMessageIndex}
+                  aria-hidden="true"
+                  className="flex flex-wrap"
+                  initial={reduceMotion ? undefined : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.22 }}
+                >
+                  {loadingMessages[loadingMessageIndex]
+                    .split("")
+                    .map((character, index) => (
+                      <motion.span
+                        key={`${loadingMessageIndex}-${index}`}
+                        className={character === " " ? "w-[0.42em]" : undefined}
+                        animate={
+                          reduceMotion
+                            ? undefined
+                            : { y: [0, -4, 0], color: ["#e8ddc8", "#1f5889", "#e8ddc8"] }
+                        }
+                        transition={{
+                          duration: 0.72,
+                          delay: index * 0.025,
+                          repeat: Infinity,
+                          repeatDelay: Math.max(
+                            0.15,
+                            0.65 - loadingMessages[loadingMessageIndex].length * 0.025,
+                          ),
+                          ease: "easeInOut",
+                        }}
+                      >
+                        {character === " " ? "\u00a0" : character}
+                      </motion.span>
+                    ))}
+                </motion.span>
+              </AnimatePresence>
+            </>
+          ) : (
+            "Decode my taste"
+          )}
+        </span>
+        <motion.span
+          aria-hidden="true"
+          className="relative z-10 shrink-0"
+          animate={
+            pending && !reduceMotion
+              ? { x: [0, 5, 0], opacity: [0.45, 1, 0.45] }
+              : undefined
+          }
+          transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ArrowRight className="size-6 transition-transform group-hover:translate-x-1 group-disabled:translate-x-0 motion-reduce:transition-none" />
+        </motion.span>
       </button>
 
       <div aria-live="polite">

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import VibeResults from "../components/vibe-results";
+import ProductSearch from "../components/product-search";
 import { AmbientDecor, CollageCard, Reveal } from "../components/motion-elements";
 import { getTasteProfile } from "../lib/taste-profile";
 
@@ -59,7 +60,9 @@ export default async function MyVibe() {
         <VibeResults analysis={tasteProfile} />
 
         {tasteProfile && (
-          <Reveal className="relative mt-24 border-2 border-motif-ivory bg-motif-ivory p-2 text-motif-black sm:mt-36 sm:p-4" aria-labelledby="evidence-heading">
+          <>
+            <ProductSearch />
+            <Reveal className="relative mt-24 border-2 border-motif-ivory bg-motif-ivory p-2 text-motif-black sm:mt-36 sm:p-4" aria-labelledby="evidence-heading">
             <div className="absolute -left-2 -top-8 rotate-[-2deg] bg-motif-blue px-4 py-2 text-xs font-bold uppercase tracking-[0.24em] text-motif-ivory sm:-left-5">
               Visual evidence
             </div>
@@ -124,7 +127,8 @@ export default async function MyVibe() {
                 </Link>
               </div>
             )}
-          </Reveal>
+            </Reveal>
+          </>
         )}
       </div>
 
