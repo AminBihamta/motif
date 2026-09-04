@@ -1,5 +1,6 @@
 import { get } from "@vercel/blob";
 import type { NextRequest } from "next/server";
+import { auth } from "../../../../auth";
 import {
   anonymousOwnerCookie,
   getOwnedTasteProfileImage,
@@ -14,16 +15,24 @@ export async function GET(
 ) {
   const { id } = await params;
   const anonymousOwnerId = request.cookies.get(anonymousOwnerCookie)?.value;
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (
-    !anonymousOwnerId ||
-    !uuidPattern.test(anonymousOwnerId) ||
+    (!anonymousOwnerId || !uuidPattern.test(anonymousOwnerId)) &&
+    !userId ||
     !uuidPattern.test(id)
   ) {
     return new Response(null, { status: 404 });
   }
 
-  const image = await getOwnedTasteProfileImage(id, anonymousOwnerId);
+  const image = await getOwnedTasteProfileImage(
+    id,
+    anonymousOwnerId && uuidPattern.test(anonymousOwnerId)
+      ? anonymousOwnerId
+      : "00000000-0000-0000-0000-000000000000",
+    userId,
+  );
 
   if (!image) {
     return new Response(null, { status: 404 });

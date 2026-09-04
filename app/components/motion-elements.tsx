@@ -1,7 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import posthog from "posthog-js";
+import { useEffect, useRef, type ReactNode } from "react";
+
+const isPostHogConfigured = Boolean(
+  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN && process.env.NEXT_PUBLIC_POSTHOG_HOST,
+);
 
 type MotionElementProps = {
   children: ReactNode;
@@ -94,6 +99,42 @@ export function CollageCard({ children, className, delay = 0 }: MotionElementPro
       {children}
     </motion.div>
   );
+}
+
+type PostHogIdentityProps = {
+  userId?: string;
+  email?: string | null;
+  name?: string | null;
+};
+
+export function PostHogIdentity({ userId, email, name }: PostHogIdentityProps) {
+  const identifiedUserId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isPostHogConfigured) return;
+
+    if (!userId) {
+      if (identifiedUserId.current) {
+        posthog.reset();
+        identifiedUserId.current = null;
+      }
+      return;
+    }
+
+    if (identifiedUserId.current && identifiedUserId.current !== userId) {
+      posthog.reset();
+    }
+
+    if (identifiedUserId.current !== userId) {
+      posthog.identify(userId, {
+        ...(email ? { email } : {}),
+        ...(name ? { name } : {}),
+      });
+      identifiedUserId.current = userId;
+    }
+  }, [email, name, userId]);
+
+  return null;
 }
 
 export function AmbientDecor({ children, className, delay = 0 }: MotionElementProps) {

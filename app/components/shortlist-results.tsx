@@ -1,9 +1,11 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, OpenNewWindow, Star } from "iconoir-react";
+import { ArrowLeft, ArrowRight, OpenNewWindow, Spark, Star } from "iconoir-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import type { ProductSearchResult } from "../lib/product-search";
+import { capturePostHogEvent } from "../lib/posthog";
+import MotifLogo from "./motif-logo";
 
 type ShortlistProfile = {
   vibeName: string;
@@ -15,6 +17,7 @@ type ShortlistResultsProps = {
   query: string;
   products: ProductSearchResult[];
   tasteProfile: ShortlistProfile | null;
+  userName: string | null;
   errorMessage?: string;
 };
 
@@ -34,6 +37,13 @@ function ProductCard({
       href={product.link}
       target="_blank"
       rel="noopener noreferrer sponsored"
+      onClick={() =>
+        capturePostHogEvent("product_result_opened", {
+          featured: Boolean(featured),
+          result_position: index + 1,
+          source: product.source,
+        })
+      }
       initial={{ opacity: 0, y: reduceMotion ? 0 : 34, rotate: 0 }}
       whileInView={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -0.35 : 0.35 }}
       whileHover={reduceMotion ? undefined : { y: -10, rotate: index % 2 === 0 ? -1 : 1 }}
@@ -100,9 +110,11 @@ export default function ShortlistResults({
   query,
   products,
   tasteProfile,
+  userName,
   errorMessage,
 }: ShortlistResultsProps) {
   const reduceMotion = useReducedMotion();
+  const signInHref = `/signin?callbackUrl=${encodeURIComponent(`/shortlist?q=${query}`)}`;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
@@ -110,10 +122,10 @@ export default function ShortlistResults({
       <motion.div aria-hidden="true" className="pointer-events-none absolute -right-32 top-44 size-80 rounded-full border-[3rem] border-motif-blue/35" animate={reduceMotion ? undefined : { rotate: 360 }} transition={{ duration: 32, repeat: Infinity, ease: "linear" }} />
 
       <header className="relative z-10 mx-3 mt-3 flex items-stretch justify-between border-2 border-motif-ivory bg-motif-black sm:mx-5 sm:mt-5">
-        <Link href="/my-vibe" className="bodoniModa flex items-center border-r-2 border-motif-ivory px-4 py-3 text-2xl font-black uppercase tracking-[-0.05em] transition-colors hover:bg-motif-ivory hover:text-motif-black sm:px-7 sm:text-3xl">
-          Motif
+        <Link href="/my-vibe" className="group flex items-center border-r-2 border-motif-ivory px-4 py-3 transition-colors hover:bg-motif-ivory sm:px-7">
+          <MotifLogo className="h-6 w-auto transition group-hover:brightness-0 sm:h-7" priority />
         </Link>
-        <p className="hidden items-center px-6 text-[10px] uppercase tracking-[0.32em] text-motif-taupe md:flex">The object edit / live signal</p>
+        <p className="hidden items-center px-6 text-[10px] uppercase tracking-[0.32em] text-motif-taupe md:flex">{userName ? `For ${userName} / the object edit` : "The object edit / live signal"}</p>
         <Link href="/my-vibe" className="flex items-center border-l-2 border-motif-ivory bg-motif-red px-4 text-xs font-bold uppercase tracking-[0.16em] transition-colors hover:bg-motif-ivory hover:text-motif-red sm:px-7 sm:text-sm">New search ↗</Link>
       </header>
 
@@ -150,6 +162,48 @@ export default function ShortlistResults({
             <div className="grid auto-rows-auto gap-6 sm:grid-cols-2 lg:auto-rows-[minmax(17rem,auto)] lg:grid-cols-4">
               {products.map((product, index) => <ProductCard key={product.id} product={product} index={index} featured={index === 0} />)}
             </div>
+            <motion.div
+              initial={{ opacity: 0, y: reduceMotion ? 0 : 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: reduceMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-16 border-2 border-motif-black bg-motif-ivory p-2 text-motif-black shadow-[10px_10px_0_var(--color-motif-red)] sm:mt-24 sm:p-4"
+            >
+              <div className="grid gap-8 border-2 border-motif-black bg-motif-blue p-6 text-motif-ivory sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div>
+                  <p className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.26em] text-motif-ivory/70">
+                    <Spark aria-hidden="true" className="size-4" />
+                    Keep the good stuff
+                  </p>
+                  <h2 className="mt-5 max-w-3xl text-5xl font-black uppercase leading-[0.8] tracking-[-0.06em] sm:text-7xl">
+                    Your taste deserves
+                    <span className="bodoniModa block font-normal italic text-motif-ivory">
+                      a longer shelf life.
+                    </span>
+                  </h2>
+                  <p className="mt-6 max-w-2xl border-l-4 border-motif-red pl-4 text-base leading-7 text-motif-ivory/75 sm:text-lg">
+                    Create an account to save this visual DNA and keep your
+                    favorite product edits close at hand.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                  <Link
+                    href={signInHref}
+                    className="group inline-flex min-w-56 items-center justify-between gap-5 border-2 border-motif-black bg-motif-red px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-transform hover:-translate-y-1 hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory"
+                  >
+                    Create your account
+                    <ArrowRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+                  </Link>
+                  <Link
+                    href={signInHref}
+                    className="group inline-flex min-w-56 items-center justify-between gap-5 border-2 border-motif-ivory bg-transparent px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-colors hover:bg-motif-ivory hover:text-motif-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory"
+                  >
+                    Find more vibes
+                    <ArrowRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
             <div className="mt-10 flex flex-wrap items-center justify-between gap-5 border-t-2 border-motif-ivory pt-5 text-[10px] font-bold uppercase tracking-[0.14em] text-motif-ivory/60"><Link href="/my-vibe" className="inline-flex items-center gap-2 text-motif-ivory transition-colors hover:text-motif-red"><ArrowLeft aria-hidden="true" className="size-4" /> Back to your vibe</Link><span>Prices and availability can change / purchases happen on Amazon</span></div>
           </section>
         )}

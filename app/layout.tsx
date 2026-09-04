@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Jost, Bodoni_Moda, Lobster_Two, Elsie, Rubik_Spray_Paint, Jacquarda_Bastarda_9, Dancing_Script } from "next/font/google";
+import { auth } from "../auth";
+import { PostHogIdentity } from "./components/motion-elements";
 import "./globals.css";
 
 const jost = Jost({
@@ -44,15 +46,35 @@ const lobsterTwo = Lobster_Two({
 export const metadata: Metadata = {
   title: "Motif",
   description: "Your vibe finder",
+  icons: {
+    icon: [{ url: "/fav-2.svg", type: "image/svg+xml" }],
+  },
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const session = await auth();
+
   return (
     <html
       lang="en"
       className={`${jost.variable} ${bodoniModa.variable} ${lobsterTwo.variable} ${elsie.variable} ${rubikSprayPaint.variable} ${jacquardaBastarda9.variable} ${dancingScript.variable}  h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <PostHogIdentity
+          userId={session?.user?.id || undefined}
+          email={session?.user?.email}
+          name={session?.user?.name}
+        />
+        {children}
+      </body>
     </html>
   );
 }

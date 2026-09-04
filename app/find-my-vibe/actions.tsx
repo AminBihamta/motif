@@ -3,6 +3,7 @@
 import { Buffer } from "node:buffer";
 import { randomUUID } from "node:crypto";
 import { del, put } from "@vercel/blob";
+import { auth } from "../../auth";
 import {
   isVibeAnalysis,
   type AnalyzeImagesState,
@@ -11,6 +12,13 @@ import {
   getOrCreateAnonymousOwnerId,
   saveTasteProfile,
 } from "../lib/taste-profile";
+import {
+  commitUsage,
+  releaseUsage,
+  reserveUsage,
+  UsageAllowanceError,
+  type UsageReservation,
+} from "../lib/usage-allowance";
 import { REQUIRED_IMAGE_COUNT } from "../lib/upload-constraints";
 
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
@@ -52,6 +60,8 @@ const vibeAnalysisSchema = {
       type: "array",
       items: { type: "string" },
       minItems: 2,
+      description:
+        "Color names with hex codes, e.g. Deep emerald green (#046307)",
     },
     preferenceInsights: {
       type: "array",
@@ -140,6 +150,8 @@ export async function analyzeImages(
     }
   }
 
+  let usageReservation: UsageReservation | null = null;
+
   try {
     const base64Files = await Promise.all(
       files.map(async (file) => {
@@ -149,6 +161,13 @@ export async function analyzeImages(
         return `data:${file.type};base64,${base64}`;
       }),
     );
+
+    const session = await auth();
+    const userId = session?.user?.id;
+    const anonymousOwnerId = userId
+      ? undefined
+      : await getOrCreateAnonymousOwnerId();
+    usageReservation = await reserveUsage("analysis", { anonymousOwnerId, userId });
 
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -193,7 +212,7 @@ export async function analyzeImages(
     "vibeName": "short recognizable style name",
     "description": "one or two sentence explanation",
     "characteristics": ["characteristic 1", "characteristic 2"],
-    "colors": ["color 1", "color 2"],
+    "colors": ["Deep emerald green (#046307)", "Antique gold (#C5A35A)"],
     "preferenceInsights": [
       "You seem drawn to spacious, open layouts",
       "You appear to prefer warm natural materials"
@@ -227,6 +246,8 @@ export async function analyzeImages(
 
     if (!response.ok) {
       console.error("OpenRouter error:", response.status, responseText);
+      await releaseUsage(usageReservation);
+      usageReservation = null;
 
       return {
         status: "error",
@@ -245,6 +266,8 @@ export async function analyzeImages(
         refusal: choice?.message?.refusal,
         error: data.error,
       });
+      await releaseUsage(usageReservation);
+      usageReservation = null;
 
       return {
         status: "error",
@@ -260,20 +283,21 @@ export async function analyzeImages(
     const analysis: unknown = JSON.parse(normalizedContent);
 
     if (!isVibeAnalysis(analysis)) {
+      await releaseUsage(usageReservation);
+      usageReservation = null;
       return {
         status: "error",
         message: "The AI response was missing required information.",
       };
     }
 
-    const anonymousOwnerId = await getOrCreateAnonymousOwnerId();
     const analysisRunId = randomUUID();
     const uploadResults = await Promise.allSettled(
       files.map((file, index) => {
         const extension = file.type === "image/png" ? "png" : "jpg";
         const pathname = [
           "taste-profiles",
-          anonymousOwnerId,
+          anonymousOwnerId ?? `user-${userId}`,
           analysisRunId,
           `${index + 1}.${extension}`,
         ].join("/");
@@ -299,6 +323,8 @@ export async function analyzeImages(
         "partially uploaded taste images",
       );
       console.error("Taste image upload failed:", uploadFailure.reason);
+      await releaseUsage(usageReservation);
+      usageReservation = null;
 
       return {
         status: "error",
@@ -316,7 +342,7 @@ export async function analyzeImages(
 
     try {
       oldBlobPathnames = await saveTasteProfile(
-        anonymousOwnerId,
+        { anonymousOwnerId, userId },
         analysis,
         storedImages,
       );
@@ -329,12 +355,26 @@ export async function analyzeImages(
     }
 
     await deleteBlobs(oldBlobPathnames, "replaced taste images");
+    await commitUsage(usageReservation);
+    usageReservation = null;
 
     return {
       status: "success",
       analysis,
     };
   } catch (error) {
+    if (usageReservation) {
+      try {
+        await releaseUsage(usageReservation);
+      } catch (releaseError) {
+        console.error("Could not restore analysis allowance:", releaseError);
+      }
+    }
+
+    if (error instanceof UsageAllowanceError) {
+      return { status: "error", message: error.message };
+    }
+
     console.error("Image analysis failed:", error);
 
     return {

@@ -1,15 +1,67 @@
-import { ArrowRight, Refresh } from "iconoir-react";
+import { ArrowRight } from "iconoir-react";
 import Link from "next/link";
 import type { TasteProfile } from "../lib/taste-profile";
-import { InsightRow, Reveal, TactileTag } from "./motion-elements";
+import { Reveal, TactileTag } from "./motion-elements";
 
-const swatchClasses = [
-  "bg-motif-red",
-  "bg-motif-blue",
-  "bg-motif-brass",
-  "bg-motif-olive",
-  "bg-motif-lavender",
-];
+const namedColorHex: Record<string, string> = {
+  emerald: "#046307",
+  green: "#2F6B3A",
+  burgundy: "#6E0F1A",
+  red: "#8A050B",
+  gold: "#C5A35A",
+  antique: "#B8963E",
+  brass: "#A77A3D",
+  cream: "#E8DDC8",
+  marble: "#D9D2C3",
+  ivory: "#E8DDC8",
+  black: "#15130F",
+  blue: "#174A7E",
+  navy: "#173858",
+  olive: "#69705A",
+  lavender: "#948492",
+  walnut: "#60412E",
+  taupe: "#A28D73",
+  bronze: "#8C6A3B",
+  copper: "#B87333",
+  silver: "#C0C0C0",
+  white: "#F5F0E6",
+  pink: "#C97B84",
+  orange: "#C56A2B",
+  yellow: "#D4B45A",
+  purple: "#6B4C7A",
+  teal: "#2A6F6A",
+  charcoal: "#29251F",
+};
+
+function extractHex(color: string) {
+  const match = color.match(/#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})\b/);
+  if (!match) return null;
+  const raw = match[1];
+  if (raw.length === 3) {
+    return `#${raw
+      .split("")
+      .map((char) => `${char}${char}`)
+      .join("")
+      .toUpperCase()}`;
+  }
+  return `#${raw.toUpperCase()}`;
+}
+
+function colorLabel(color: string) {
+  return color.replace(/\s*\(?(#[0-9A-Fa-f]{3,8})\)?\s*/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function colorToHex(color: string) {
+  const explicit = extractHex(color);
+  if (explicit) return explicit;
+
+  const tokens = color.toLowerCase().split(/[^a-z]+/).filter(Boolean);
+  for (const token of tokens) {
+    if (namedColorHex[token]) return namedColorHex[token];
+  }
+
+  return "#A28D73";
+}
 
 export default function VibeResults({
   analysis,
@@ -56,9 +108,6 @@ export default function VibeResults({
               Analysis complete
             </span>
             <span className="h-px flex-1 bg-motif-ivory/35" />
-            <span className="text-[10px] uppercase tracking-[0.2em] text-motif-taupe">
-              Issue 001
-            </span>
           </div>
 
           <h1 className="text-[4rem] font-black uppercase leading-[0.75] tracking-[-0.075em] sm:text-[6.5rem] lg:text-[8.5rem]">
@@ -69,105 +118,68 @@ export default function VibeResults({
               {analysis.vibeName}
             </span>
           </h1>
-
-          <div className="mt-10 grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-            <p className="max-w-2xl border-l-[6px] border-motif-blue pl-5 text-lg leading-8 text-motif-ivory/80">
-              {analysis.description}
-            </p>
-            <Link
-              href="/find-my-vibe"
-              className="inline-flex w-fit items-center gap-2 border-b-2 border-motif-ivory pb-1 text-xs font-bold uppercase tracking-[0.14em] transition-colors hover:border-motif-red hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory"
-            >
-              <Refresh aria-hidden="true" className="size-4" />
-              Recalibrate
-            </Link>
-          </div>
         </div>
 
         <aside className="relative self-end border-2 border-motif-ivory bg-motif-ivory p-3 text-motif-black shadow-[10px_10px_0_var(--color-motif-blue)] lg:col-span-3 lg:rotate-2">
-          <div className="mb-3 flex items-center justify-between border-b-2 border-motif-black pb-2">
+          <div className="mb-3 border-b-2 border-motif-black pb-2">
             <h2 className="text-xs font-black uppercase tracking-[0.18em]">
-              Color evidence
+              Color analysis
             </h2>
-            <span className="bodoniModa text-2xl">✦</span>
           </div>
           <div>
-            {analysis.colors.slice(0, 5).map((color, index) => (
-              <div
-                key={`${color}-${index}`}
-                className="grid grid-cols-[3rem_1fr] items-stretch border-b border-motif-black last:border-b-0"
-              >
-                <span
-                  aria-hidden="true"
-                  className={`min-h-12 border-r border-motif-black ${
-                    swatchClasses[index % swatchClasses.length]
-                  }`}
-                />
-                <span className="flex items-center px-3 text-sm font-bold uppercase">
-                  {color}
-                </span>
-              </div>
-            ))}
+            {analysis.colors.slice(0, 5).map((color, index) => {
+              const hex = colorToHex(color);
+              const label = colorLabel(color);
+
+              return (
+                <div
+                  key={`${color}-${index}`}
+                  className="grid grid-cols-[3rem_1fr] items-stretch border-b border-motif-black last:border-b-0"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="min-h-12 border-x border-motif-black"
+                    style={{ backgroundColor: hex }}
+                  />
+                  <span className="flex flex-col justify-center gap-0.5 px-3 py-2">
+                    <span className="text-sm font-bold uppercase leading-tight">
+                      {label}
+                    </span>
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-motif-black/55">
+                      {hex}
+                    </span>
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </aside>
+
+        <div className="mt-6 lg:col-span-12 lg:mt-10">
+          <p className="w-full border-l-[6px] border-motif-blue pl-5 text-lg leading-8 text-motif-ivory/80">
+            {analysis.description}
+          </p>
+        </div>
       </Reveal>
 
-      <section className="relative mt-24 border-y-2 border-motif-ivory py-11 sm:mt-36">
-        <span className="absolute -top-4 left-0 bg-motif-black pr-4 text-xs font-black uppercase tracking-[0.26em] text-motif-red">
-          The visual DNA
-        </span>
+      <section className="relative mt-28 border-b border-motif-ivory pb-11 sm:mt-40">
+        <div className="mb-8 flex items-center gap-3">
+          <span className="bg-motif-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">
+            The visual DNA
+          </span>
+          <span className="h-px flex-1 bg-motif-ivory/35" />
+        </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-6">
           {analysis.characteristics.map((characteristic, index) => (
             <TactileTag
               key={`${characteristic}-${index}`}
               delay={index * 0.06}
-              className="inline-block cursor-default border-2 border-motif-ivory bg-motif-charcoal px-5 py-3 text-lg font-bold uppercase shadow-[5px_5px_0_var(--color-motif-red)] sm:text-2xl"
+              className="inline-block cursor-default border-2 border-motif-ivory bg-motif-charcoal px-5 py-3 text-lg font-bold uppercase text-motif-ivory shadow-[5px_5px_0_var(--color-motif-red)] sm:text-2xl"
             >
               {characteristic}
             </TactileTag>
           ))}
         </div>
-      </section>
-
-      <section className="mt-24 sm:mt-36" aria-labelledby="taste-heading">
-        <div className="mb-10 grid gap-5 lg:grid-cols-12">
-          <p className="text-xs font-black uppercase tracking-[0.26em] text-motif-red lg:col-span-3">
-            Read between
-            <br />
-            the images
-          </p>
-          <h2
-            id="taste-heading"
-            className="text-5xl font-black uppercase leading-[0.82] tracking-[-0.06em] sm:text-7xl lg:col-span-9 lg:text-8xl"
-          >
-            What your choices
-            <span className="bodoniModa block font-normal italic text-motif-taupe">
-              are really saying.
-            </span>
-          </h2>
-        </div>
-
-        <ol className="border-t-2 border-motif-ivory">
-          {analysis.preferenceInsights.map((insight, index) => (
-            <InsightRow
-              key={`${insight}-${index}`}
-              delay={index * 0.06}
-              direction={index % 2 === 0 ? "left" : "right"}
-              className={`group grid min-h-40 border-b-2 border-motif-ivory transition-colors duration-300 sm:grid-cols-[10rem_1fr] ${
-                index % 2 === 1
-                  ? "bg-motif-ivory text-motif-black"
-                  : "hover:bg-motif-blue"
-              }`}
-            >
-              <span className="bodoniModa flex items-center border-b-2 border-current px-5 py-3 text-6xl sm:border-b-0 sm:border-r-2 sm:text-8xl">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <p className="flex max-w-4xl items-center px-5 py-7 text-lg leading-8 sm:px-10 sm:text-2xl sm:leading-9">
-                {insight}
-              </p>
-            </InsightRow>
-          ))}
-        </ol>
       </section>
     </div>
   );

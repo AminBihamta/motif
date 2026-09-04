@@ -61,57 +61,86 @@ export async function getOrCreateAnonymousOwnerId() {
   return ownerId;
 }
 
+export async function getAnonymousOwnerId() {
+  const ownerId = (await cookies()).get(anonymousOwnerCookie)?.value;
+  return ownerId && uuidPattern.test(ownerId) ? ownerId : undefined;
+}
+
 export async function saveTasteProfile(
-  anonymousOwnerId: string,
+  owner: { anonymousOwnerId?: string; userId?: string },
   analysis: VibeAnalysis,
   images: StoredTasteProfileImage[],
 ) {
   const sql = getDatabase();
   const imagePayload = JSON.stringify(images);
+  const ownerId = owner.userId ?? owner.anonymousOwnerId;
 
-  const [, oldBlobRows] = await sql.transaction([
-    sql`
-      INSERT INTO public.taste_profiles (
-        anonymous_id,
-        vibe_name,
-        description,
-        characteristics,
-        colors,
-        preference_insights,
-        search_query
-      )
-      VALUES (
-        ${anonymousOwnerId}::uuid,
-        ${analysis.vibeName},
-        ${analysis.description},
-        ${JSON.stringify(analysis.characteristics)}::jsonb,
-        ${JSON.stringify(analysis.colors)}::jsonb,
-        ${JSON.stringify(analysis.preferenceInsights)}::jsonb,
-        ${analysis.searchQuery}
-      )
-      ON CONFLICT (anonymous_id) DO UPDATE SET
-        vibe_name = EXCLUDED.vibe_name,
-        description = EXCLUDED.description,
-        characteristics = EXCLUDED.characteristics,
-        colors = EXCLUDED.colors,
-        preference_insights = EXCLUDED.preference_insights,
-        search_query = EXCLUDED.search_query,
-        updated_at = now()
-    `,
+  if (!ownerId) {
+    throw new Error("A taste profile owner is required.");
+  }
+
+  const [profile] = owner.userId
+    ? await sql`
+        INSERT INTO public.taste_profiles (
+          anonymous_id, user_id, vibe_name, description, characteristics,
+          colors, preference_insights, search_query
+        )
+        VALUES (
+          NULL, ${owner.userId}, ${analysis.vibeName}, ${analysis.description},
+          ${JSON.stringify(analysis.characteristics)}::jsonb,
+          ${JSON.stringify(analysis.colors)}::jsonb,
+          ${JSON.stringify(analysis.preferenceInsights)}::jsonb,
+          ${analysis.searchQuery}
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          vibe_name = EXCLUDED.vibe_name,
+          description = EXCLUDED.description,
+          characteristics = EXCLUDED.characteristics,
+          colors = EXCLUDED.colors,
+          preference_insights = EXCLUDED.preference_insights,
+          search_query = EXCLUDED.search_query,
+          updated_at = now()
+        RETURNING id
+      `
+    : await sql`
+        INSERT INTO public.taste_profiles (
+          anonymous_id, user_id, vibe_name, description, characteristics,
+          colors, preference_insights, search_query
+        )
+        VALUES (
+          ${owner.anonymousOwnerId}::uuid, NULL, ${analysis.vibeName},
+          ${analysis.description},
+          ${JSON.stringify(analysis.characteristics)}::jsonb,
+          ${JSON.stringify(analysis.colors)}::jsonb,
+          ${JSON.stringify(analysis.preferenceInsights)}::jsonb,
+          ${analysis.searchQuery}
+        )
+        ON CONFLICT (anonymous_id) DO UPDATE SET
+          vibe_name = EXCLUDED.vibe_name,
+          description = EXCLUDED.description,
+          characteristics = EXCLUDED.characteristics,
+          colors = EXCLUDED.colors,
+          preference_insights = EXCLUDED.preference_insights,
+          search_query = EXCLUDED.search_query,
+          updated_at = now()
+        RETURNING id
+      `;
+
+  const profileId = profile?.id;
+
+  if (typeof profileId !== "string") {
+    throw new Error("Taste profile could not be saved.");
+  }
+
+  const [oldBlobRows] = await sql.transaction([
     sql`
       SELECT image.blob_pathname
       FROM public.taste_profile_images AS image
-      INNER JOIN public.taste_profiles AS profile
-        ON profile.id = image.profile_id
-      WHERE profile.anonymous_id = ${anonymousOwnerId}::uuid
+      WHERE image.profile_id = ${profileId}::uuid
     `,
     sql`
       DELETE FROM public.taste_profile_images
-      WHERE profile_id = (
-        SELECT id
-        FROM public.taste_profiles
-        WHERE anonymous_id = ${anonymousOwnerId}::uuid
-      )
+      WHERE profile_id = ${profileId}::uuid
     `,
     sql`
       INSERT INTO public.taste_profile_images (
@@ -131,7 +160,7 @@ export async function saveTasteProfile(
         "blobPathname" text,
         "contentType" text
       )
-      WHERE profile.anonymous_id = ${anonymousOwnerId}::uuid
+      WHERE profile.id = ${profileId}::uuid
     `,
   ]);
 
@@ -140,37 +169,42 @@ export async function saveTasteProfile(
     .filter((pathname): pathname is string => typeof pathname === "string");
 }
 
-export async function getTasteProfile(): Promise<TasteProfile | null> {
+export async function getTasteProfile(userId?: string): Promise<TasteProfile | null> {
   const anonymousOwnerId = (await cookies()).get(anonymousOwnerCookie)?.value;
 
-  if (!anonymousOwnerId || !uuidPattern.test(anonymousOwnerId)) {
+  if (
+    (!anonymousOwnerId || !uuidPattern.test(anonymousOwnerId)) &&
+    !userId
+  ) {
     return null;
   }
 
   const sql = getDatabase();
-  const [rows, imageRows] = await sql.transaction([
-    sql`
-      SELECT
-        id,
-        vibe_name,
-        description,
-        characteristics,
-        colors,
-        preference_insights,
-        search_query
-      FROM public.taste_profiles
-      WHERE anonymous_id = ${anonymousOwnerId}::uuid
-      LIMIT 1
-    `,
-    sql`
-      SELECT image.id, image.position
-      FROM public.taste_profile_images AS image
-      INNER JOIN public.taste_profiles AS profile
-        ON profile.id = image.profile_id
-      WHERE profile.anonymous_id = ${anonymousOwnerId}::uuid
-      ORDER BY image.position
-    `,
-  ]);
+  const validAnonymousOwnerId =
+    anonymousOwnerId && uuidPattern.test(anonymousOwnerId)
+      ? anonymousOwnerId
+      : null;
+  const rows = await sql`
+    SELECT
+      id,
+      vibe_name,
+      description,
+      characteristics,
+      colors,
+      preference_insights,
+      search_query
+    FROM public.taste_profiles
+    WHERE (
+      ${userId ?? null}::text IS NOT NULL
+      AND user_id = ${userId ?? null}
+    )
+    OR (
+      ${validAnonymousOwnerId}::uuid IS NOT NULL
+      AND anonymous_id = ${validAnonymousOwnerId}::uuid
+    )
+    ORDER BY CASE WHEN user_id = ${userId ?? null} THEN 0 ELSE 1 END
+    LIMIT 1
+  `;
   const row = rows[0];
 
   if (!row) {
@@ -190,6 +224,13 @@ export async function getTasteProfile(): Promise<TasteProfile | null> {
     return null;
   }
 
+  const imageRows = await sql`
+    SELECT image.id, image.position
+    FROM public.taste_profile_images AS image
+    WHERE image.profile_id = ${row.id}::uuid
+    ORDER BY image.position
+  `;
+
   const images = (imageRows as TasteProfileImageRow[])
     .filter(
       (image): image is { id: string; position: number } =>
@@ -203,6 +244,7 @@ export async function getTasteProfile(): Promise<TasteProfile | null> {
 export async function getOwnedTasteProfileImage(
   imageId: string,
   anonymousOwnerId: string,
+  userId?: string,
 ) {
   const sql = getDatabase();
   const rows = await sql`
@@ -211,7 +253,13 @@ export async function getOwnedTasteProfileImage(
     INNER JOIN public.taste_profiles AS profile
       ON profile.id = image.profile_id
     WHERE image.id = ${imageId}::uuid
-      AND profile.anonymous_id = ${anonymousOwnerId}::uuid
+      AND (
+        profile.anonymous_id = ${anonymousOwnerId}::uuid
+        OR (
+          ${userId ?? null}::text IS NOT NULL
+          AND profile.user_id = ${userId ?? null}
+        )
+      )
     LIMIT 1
   ` as OwnedImageRow[];
   const row = rows[0];
@@ -228,4 +276,30 @@ export async function getOwnedTasteProfileImage(
     blobPathname: row.blob_pathname,
     contentType: row.content_type,
   };
+}
+
+export async function claimAnonymousTasteProfile(userId: string) {
+  const anonymousOwnerId = (await cookies()).get(anonymousOwnerCookie)?.value;
+
+  if (!anonymousOwnerId || !uuidPattern.test(anonymousOwnerId) || !userId) {
+    return false;
+  }
+
+  const sql = getDatabase();
+  const rows = await sql`
+    UPDATE public.taste_profiles AS anonymous_profile
+    SET
+      user_id = ${userId},
+      anonymous_id = NULL,
+      updated_at = now()
+    WHERE anonymous_profile.anonymous_id = ${anonymousOwnerId}::uuid
+      AND NOT EXISTS (
+        SELECT 1
+        FROM public.taste_profiles AS existing_profile
+        WHERE existing_profile.user_id = ${userId}
+      )
+    RETURNING anonymous_profile.id
+  ` as { id: unknown }[];
+
+  return rows.length > 0;
 }

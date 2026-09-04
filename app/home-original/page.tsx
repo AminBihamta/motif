@@ -2,6 +2,7 @@ import CustomLink from "../components/CustomLink";
 import Image from "next/image";
 import { Running } from "iconoir-react";
 import AnimatedContainer from "../components/animated-container";
+import MotifLogo from "../components/motif-logo";
 import Popup from "../components/popup";
 
 export default function Home() {
@@ -65,9 +66,9 @@ export default function Home() {
       <main className="w-full h-full flex justify-center md:justify-start items-center flex-col md:pt-50">
         <div className="flex flex-col">
           <h1 className="text-6xl md:text-9xl text-center font-light">Welcome to</h1>
-          <h1 className="font-animation font-bold absolute text-6xl md:text-9xl text-center left-1/2 -translate-x-1/2 translate-y-16 md:translate-y-32">
-            Motif
-          </h1>
+          <div className="absolute left-1/2 flex w-[min(90vw,36rem)] -translate-x-1/2 translate-y-16 justify-center md:w-[min(70vw,48rem)] md:translate-y-32">
+            <MotifLogo className="h-auto w-full brightness-0 dark:brightness-100" priority />
+          </div>
 
           <h2 className="text-md md:text-2xl text-center mt-20 md:mt-40">Your vibe finder</h2>
           <Image

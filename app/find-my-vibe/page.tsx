@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { auth } from "../../auth";
 import UploadForm from "../components/upload-form";
+import MotifLogo from "../components/motif-logo";
 import { AmbientDecor, Reveal } from "../components/motion-elements";
+import { getAnonymousOwnerId } from "../lib/taste-profile";
+import { getUsageSummary } from "../lib/usage-allowance";
 
 export const metadata: Metadata = {
   title: "Find My Vibe — Motif",
   description: "Upload six images and decode your personal visual taste.",
 };
 
-export default function FindMyVibe() {
+export default async function FindMyVibe() {
+  const session = await auth();
+  const usage = await getUsageSummary({
+    userId: session?.user?.id,
+    anonymousOwnerId: session?.user?.id ? undefined : await getAnonymousOwnerId(),
+  });
   return (
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:38px_38px]" />
@@ -23,8 +32,8 @@ export default function FindMyVibe() {
       </AmbientDecor>
 
       <header className="relative z-30 flex min-h-16 items-stretch border-b-2 border-motif-ivory bg-motif-black">
-        <Link href="/" className="bodoniModa flex items-center border-r-2 border-motif-ivory px-5 text-3xl font-black tracking-[-0.06em] transition-colors hover:bg-motif-ivory hover:text-motif-black focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-red sm:px-8">
-          Motif
+        <Link href="/" className="group flex items-center border-r-2 border-motif-ivory px-5 transition-colors hover:bg-motif-ivory focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-red sm:px-8">
+          <MotifLogo className="h-7 w-auto transition group-hover:brightness-0 sm:h-8" priority />
         </Link>
         <p className="hidden flex-1 items-center px-6 text-[10px] font-bold uppercase tracking-[0.3em] text-motif-taupe md:flex">
           Visual intake / six frames
@@ -70,7 +79,7 @@ export default function FindMyVibe() {
             Six clues. One profile.
           </div>
           <div className="border-2 border-motif-ivory bg-motif-charcoal p-3 shadow-[12px_12px_0_var(--color-motif-red)] sm:p-5">
-            <UploadForm />
+            <UploadForm usage={usage} />
           </div>
         </Reveal>
       </div>

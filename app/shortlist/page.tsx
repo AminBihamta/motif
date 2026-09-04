@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "../../auth";
 import ShortlistResults from "../components/shortlist-results";
 import {
   searchTasteShapedProducts,
@@ -20,7 +21,9 @@ export default async function ShortlistPage({
   const params = await searchParams;
   const rawQuery = Array.isArray(params.q) ? params.q[0] : params.q;
   const query = rawQuery?.trim() ?? "";
-  const tasteProfile = await getTasteProfile();
+  const session = await auth();
+  const tasteProfile = await getTasteProfile(session?.user?.id);
+  const userName = session?.user?.name ?? null;
 
   if (!query) {
     return (
@@ -52,6 +55,7 @@ export default async function ShortlistPage({
         query={query}
         products={[]}
         tasteProfile={tasteProfile}
+        userName={userName}
         errorMessage={
           tasteProfile
             ? "That object needs between 2 and 80 characters."
@@ -79,6 +83,7 @@ export default async function ShortlistPage({
       query={query}
       products={products}
       tasteProfile={tasteProfile}
+      userName={userName}
       errorMessage={errorMessage}
     />
   );

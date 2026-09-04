@@ -19,12 +19,14 @@ saved visual evidence, and optional taste-shaped shopping results.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Default bold editorial homepage |
+| `/` | Minimal coming-soon homepage |
+| `/dev-home` | Editorial homepage concept |
 | `/home-original` | Older homepage concept kept for comparison |
 | `/find-my-vibe` | Six-image upload and analysis form |
 | `/my-vibe` | Server-rendered profile and saved evidence gallery |
 | `/api/taste-images/:id` | Owner-checked private image proxy |
-| `/signin` | Visual sign-in mockup; authentication is not implemented |
+| `/signin` | Google or email/password sign-in and account creation |
+| `/api/auth/[...nextauth]` | Auth.js OAuth and session handlers |
 
 ## Getting started
 
@@ -57,12 +59,32 @@ SEARCHAPI_AMAZON_DOMAIN=amazon.com
 SEARCHAPI_AMAZON_SORT_BY=featured
 SEARCHAPI_LANGUAGE=en_GB
 OPENROUTER_MODEL=dots-studio/dots-3-note-preview:free
+AUTH_SECRET=...
+AUTH_GOOGLE_ID=...
+AUTH_GOOGLE_SECRET=...
+MOTIF_APP_URL=http://localhost:3000
+BREVO_API_KEY=...
+BREVO_SENDER_EMAIL=hello@example.com
+BREVO_SENDER_NAME=Motif
+MOTIF_ABUSE_HMAC_SECRET=...
 ```
 
 `OPENROUTER_MODEL` and the `SEARCHAPI_*` settings after `SEARCHAPI_API_KEY` are
 optional. The analysis flow needs the first three values. Product search needs
 `SEARCHAPI_API_KEY` in addition to a saved profile. Do not commit `.env.local`
 or expose these values in client code.
+
+Google sign-in requires an OAuth client in Google Cloud Console. Add
+`http://localhost:3000/api/auth/callback/google` as a local redirect URI and
+the equivalent production URL for the deployed site. `AUTH_SECRET` should be
+a long random value generated for the deployment.
+
+Email/password accounts require Brevo transactional-email credentials. New
+users provide a name and password; passwords are hashed server-side and must
+be verified through a 24-hour email link before the five analysis and five
+search credits per week are granted. `MOTIF_ABUSE_HMAC_SECRET` is a server-only random
+secret used to derive a rotating, non-reversible guest abuse signal; never
+expose it to the browser.
 
 ## How the main flow works
 
@@ -74,11 +96,20 @@ or expose these values in client code.
 3. The originals are uploaded with private access to Vercel Blob. The returned
    analysis and Blob path metadata are upserted into Postgres.
 4. An HTTP-only `motif_anonymous_owner` cookie identifies the browser without
-   requiring an account. Re-running an analysis replaces that anonymous
-   profile and removes its old image records and Blob objects.
-5. `/my-vibe` reads the profile server-side. Evidence images are only exposed
+   requiring an account. Each guest receives one analysis and one product
+   search. Motif stores only a rotating HMAC of a normalized network prefix and
+   coarse user-agent family to rate-limit rapid creation of fresh guest IDs;
+   it does not use browser fingerprinting. Re-running an analysis replaces that
+   anonymous profile and removes its old image records and Blob objects.
+5. Google and email/password sign-in use Auth.js JWT sessions backed by Neon
+   user records. On a first sign-in, the current anonymous profile is claimed
+   by the authenticated user when that account does not already have a profile.
+   Google supplies the saved account name, email, and avatar; email/password
+   registration stores the submitted name. Verified accounts receive five
+   analyses and five searches per week, independent of any guest usage.
+6. `/my-vibe` reads the profile server-side. Evidence images are only exposed
    through the owner-checking `/api/taste-images/[id]` Route Handler.
-6. The product search form calls a Server Action that augments the user’s
+7. The product search form calls a Server Action that augments the user’s
    object query with terms from the generated taste profile before calling
    SearchApi's Amazon Search endpoint. Results link to Amazon pages; prices and
    availability may change.
@@ -87,15 +118,16 @@ or expose these values in client code.
 
 Apply the SQL in `db/migrations/` to the configured Neon database. The
 repository currently contains SQL migrations but no migration CLI or automatic
-migration runner. The schema stores one anonymous profile owner, JSON arrays
-for the generated analysis, and up to six ordered image records per profile.
+migration runner. The schema stores anonymous and authenticated profile
+ownership, Auth.js users/accounts/sessions, JSON arrays for the generated
+analysis, and up to six ordered image records per profile.
 
 ## Project structure
 
 ```text
 app/
   page.tsx                         default homepage entrypoint
-  home-bold/                       current editorial homepage
+  dev-home/                        editorial homepage concept (dev)
   home-original/                   legacy homepage concept
   find-my-vibe/                    upload page and analysis Server Action
   my-vibe/                         result page and product-search Server Action
