@@ -15,74 +15,62 @@ export const metadata: Metadata = {
 const heroCollagePools = [
   [
     {
-      src: "/assets/style-references-commercial-partial-2/01-mid-century.jpg",
-      alt: "Mid-century wall shelves packed with books and objects",
+      src: "/assets/homepage-images/pexels-photo-6070190.jpeg",
+      alt: "Modern living room with a tobacco sofa and marble coffee table",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/03-mid-century.jpg",
-      alt: "Mid-century room divider and lounge seating",
+      src: "/assets/homepage-images/pexels-photo-37305984.jpeg",
+      alt: "Man unfurling a rug in a shop lined with patterned carpets",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/04-mid-century.jpg",
-      alt: "Mid-century interior with warm wood tones",
+      src: "/assets/homepage-images/pexels-photo-34982152.jpeg",
+      alt: "Misty rolling hills with cypress trees and vineyards",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/02-mid-century.jpg",
-      alt: "Mid-century living space detail",
-    },
-  ],
-  [
-    {
-      src: "/assets/style-references-commercial-partial-2/23-scandinavian.jpg",
-      alt: "Scandinavian table still life with flowers and a blue plate",
-    },
-    {
-      src: "/assets/style-references-commercial-partial-2/29-scandinavian.jpg",
-      alt: "Scandinavian interior with soft daylight",
-    },
-    {
-      src: "/assets/style-references-commercial-partial-2/26-scandinavian.jpg",
-      alt: "Scandinavian room with pale wood and linen",
-    },
-    {
-      src: "/assets/style-references-commercial-partial-2/30-scandinavian.jpg",
-      alt: "Scandinavian still life and soft textures",
+      src: "/assets/homepage-images/pexels-photo-21263499.jpeg",
+      alt: "Hand holding a two-tone leather handbag by its chain strap",
     },
   ],
   [
     {
-      src: "/assets/style-references-commercial-partial-2/18-brutalist.jpg",
-      alt: "Brutalist tower facades shot from below",
+      src: "/assets/homepage-images/pexels-photo-33685845.jpeg",
+      alt: "Marble hallway overlooking a cream modular lounge",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/17-brutalist.jpg",
-      alt: "Brutalist concrete architecture",
+      src: "/assets/homepage-images/pexels-photo-38188111.jpeg",
+      alt: "Sunlit city sidewalk outside a Dior boutique",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/19-brutalist.jpg",
-      alt: "Brutalist building geometry and shadow",
-    },
-    {
-      src: "/assets/style-references-commercial-partial-2/20-brutalist.jpg",
-      alt: "Brutalist facade detail",
+      src: "/assets/homepage-images/pexels-photo-31513715.jpeg",
+      alt: "Collection of wristwatches arranged in a velvet case",
     },
   ],
   [
     {
-      src: "/assets/style-references/40-art-deco.jpg",
-      alt: "Art Deco staircase with a red carpet runner",
+      src: "/assets/homepage-images/pexels-photo-10570287.jpeg",
+      alt: "Ornate staircase with crystal balusters and gilded columns",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/13-art-deco.jpg",
-      alt: "Art Deco interior detail",
+      src: "/assets/homepage-images/pexels-photo-33738275.jpeg",
+      alt: "Grand wood-and-stone estate with a brick garden path",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/14-art-deco.jpg",
-      alt: "Art Deco architectural ornament",
+      src: "/assets/homepage-images/pexels-photo-35756968.jpeg",
+      alt: "Two embroidered floral pendants on a jewelry bust",
+    },
+  ],
+  [
+    {
+      src: "/assets/homepage-images/pexels-photo-29725753.jpeg",
+      alt: "Person standing in an ornate carved stone gateway by the water",
     },
     {
-      src: "/assets/style-references-commercial-partial-2/15-art-deco.jpg",
-      alt: "Art Deco room with marble and mural",
+      src: "/assets/homepage-images/pexels-photo-7679824.jpeg",
+      alt: "Gold chain necklaces hanging from a black jewelry stand",
+    },
+    {
+      src: "/assets/homepage-images/pexels-photo-34392737.jpeg",
+      alt: "Dense cluster of terracotta rooftops in a hillside town",
     },
   ],
 ];
@@ -327,7 +315,7 @@ export default function BoldHome() {
 
           <Reveal
             delay={0.2}
-            className="mt-10 flex justify-center sm:justify-start"
+            className="mt-10 flex justify-end"
           >
             <Link
               href="/find-my-vibe"
@@ -384,9 +372,9 @@ export default function BoldHome() {
           </div>
         </div>
 
-        <div className="mx-auto mt-14 max-w-[96rem] px-4 sm:px-8 lg:px-12">
-          <Reveal>
-            <p className="max-w-lg border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80 sm:text-lg sm:leading-8">
+        <div className="mx-auto mt-14 flex max-w-[96rem] justify-end px-4 sm:px-8 lg:px-12">
+          <Reveal className="max-w-lg">
+            <p className="border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80 sm:text-lg sm:leading-8">
               Once your profile exists, search any object. Motif blends your
               visual DNA with live shopping results for the closest fit.
             </p>
