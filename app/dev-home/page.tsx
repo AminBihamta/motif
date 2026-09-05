@@ -9,7 +9,7 @@ import MotifLogo from "../components/motif-logo";
 
 export const metadata: Metadata = {
   title: "Motif — Find your vibe",
-  description: "Find what you actually like using Motif!",
+  description: "Find what you actually like with Motif!",
 };
 
 const heroCollagePools = [
@@ -90,15 +90,54 @@ const heroCollagePools = [
 const productPreviews = [
   {
     src: "/assets/product-previews/chair.png",
-    alt: "Lounge chair",
+    alt: "Walnut lounge chair with olive upholstery",
+  },
+  {
+    src: "/assets/product-previews/watch.png",
+    alt: "Gold watch with cream dial and tan leather strap",
   },
   {
     src: "/assets/product-previews/lamp.png",
-    alt: "Table lamp",
+    alt: "Brass table lamp with ivory shade and marble base",
+  },
+  {
+    src: "/assets/product-previews/bag.png",
+    alt: "Burgundy leather tote bag",
   },
   {
     src: "/assets/product-previews/jacket.png",
-    alt: "Tailored jacket",
+    alt: "Tailored charcoal wool jacket",
+  },
+  {
+    src: "/assets/product-previews/vase.png",
+    alt: "Terracotta vase with a sculptural looped handle",
+  },
+  {
+    src: "/assets/product-previews/boots.png",
+    alt: "Tan leather Chelsea boots",
+  },
+  {
+    src: "/assets/product-previews/table.png",
+    alt: "Round walnut side table with tapered legs",
+  },
+  {
+    src: "/assets/product-previews/sunglasses.png",
+    alt: "Tortoiseshell sunglasses with brown lenses",
+  },
+];
+
+const profileOutputs = [
+  {
+    title: "A named vibe",
+    body: "Your aesthetic, actually named — not “minimalist-ish”.",
+  },
+  {
+    title: "Color DNA",
+    body: "The five colors your eye keeps returning to, with hex codes.",
+  },
+  {
+    title: "Shoppable traits",
+    body: "The specific details Motif matches live products against.",
   },
 ];
 
@@ -184,7 +223,7 @@ export default function BoldHome() {
 
             <div className="mt-10 max-w-xl  mt-20">
               <p className="text-base leading-7 text-motif-ivory/75 sm:text-lg sm:leading-8">
-                Find what you actually like using Motif!
+                Find what you actually like with Motif!
               </p>
               <PrimaryCta className="mt-8">Find my vibe</PrimaryCta>
             </div>
@@ -199,21 +238,32 @@ export default function BoldHome() {
           <Reveal className="grid gap-10 lg:grid-cols-[0.9fr_1.2fr] lg:items-center lg:gap-14">
             <div>
               <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-motif-ivory/70">
-                What Motif returns
+                What Motif does
               </p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
-                Sample profile
-              </p>
-              <h2 className="mt-3 max-w-xl text-4xl font-black uppercase leading-[0.88] tracking-[-0.05em] sm:text-6xl">
-                Opulent
+              <h2 className="max-w-xl text-4xl font-black uppercase leading-[0.88] tracking-[-0.05em] sm:text-6xl">
+                You know it when
                 <span className="bodoniModa mt-2 block font-normal italic normal-case text-motif-ivory">
-                  Maximalism.
+                  you see it.
                 </span>
               </h2>
               <p className="mt-6 max-w-md border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80">
-                A named vibe, color DNA, and traits you can actually shop with —
-                not another vague aesthetic quiz result.
+                You can spot what you like instantly, but never name it. Motif
+                reads six images you love and gives that instinct a name, a
+                color DNA, and a list of traits — so you can search for any
+                object and get results that actually look like you.
               </p>
+              <ul className="mt-8 max-w-md divide-y divide-motif-ivory/20 border-y border-motif-ivory/20">
+                {profileOutputs.map((item) => (
+                  <li key={item.title} className="py-3">
+                    <p className="text-sm font-black uppercase tracking-[0.14em]">
+                      {item.title}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-motif-ivory/70">
+                      {item.body}
+                    </p>
+                  </li>
+                ))}
+              </ul>
               <Link
                 href="/find-my-vibe"
                 className="mt-8 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-motif-ivory underline decoration-motif-red decoration-2 underline-offset-4 transition-colors hover:text-motif-red"
@@ -223,15 +273,20 @@ export default function BoldHome() {
               </Link>
             </div>
 
-            <div className="relative overflow-hidden border-2 border-motif-black bg-motif-black shadow-[12px_12px_0_var(--color-motif-black)]">
-              <Image
-                src="/assets/marketing/my-vibe-result.png"
-                alt="Example Motif vibe results page showing Opulent Maximalism with color analysis and visual DNA"
-                width={1600}
-                height={1200}
-                className="h-auto w-full"
-                sizes="(max-width: 1024px) 100vw, 55vw"
-              />
+            <div>
+              <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
+                Sample result — Opulent Maximalism
+              </p>
+              <div className="relative overflow-hidden border-2 border-motif-black bg-motif-black shadow-[12px_12px_0_var(--color-motif-black)]">
+                <Image
+                  src="/assets/marketing/my-vibe-result.png"
+                  alt="Example Motif vibe results page showing Opulent Maximalism with color analysis and visual DNA"
+                  width={1600}
+                  height={1200}
+                  className="h-auto w-full"
+                  sizes="(max-width: 1024px) 100vw, 55vw"
+                />
+              </div>
             </div>
           </Reveal>
         </div>
@@ -288,46 +343,54 @@ export default function BoldHome() {
         </div>
       </section>
 
-      <section className="relative z-10 overflow-hidden border-y-2 border-motif-ivory bg-motif-black px-4 py-16 sm:px-8 sm:py-24 lg:px-12">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-[18%] hidden w-px bg-motif-ivory/15 lg:block"
-        />
-        <div className="relative mx-auto grid max-w-[96rem] gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16">
+      <section className="relative z-10 overflow-hidden border-y-2 border-motif-ivory bg-motif-blue py-20 text-motif-ivory sm:py-28">
+        <div className="mx-auto max-w-[96rem] px-4 sm:px-8 lg:px-12">
           <Reveal>
-            <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-motif-red">
+            <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-motif-ivory/70">
               Taste → object
             </p>
-            <h2 className="max-w-2xl text-5xl font-black uppercase leading-[0.84] tracking-[-0.06em] sm:text-7xl">
+            <h2 className="text-6xl font-black uppercase leading-[0.82] tracking-[-0.065em] sm:text-8xl lg:text-9xl">
               Find things
               <span className="bodoniModa block font-normal italic normal-case text-motif-taupe">
                 that get you.
               </span>
             </h2>
-            <p className="mt-6 max-w-lg border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/75 sm:text-lg sm:leading-8">
+          </Reveal>
+        </div>
+
+        <div className="mt-14 overflow-hidden">
+          <div id="product-marquee" className="flex w-max">
+            {[...productPreviews, ...productPreviews].map((item, index) => {
+              const isClone = index >= productPreviews.length;
+
+              return (
+                <div
+                  key={`${item.src}-${index}`}
+                  className="shrink-0 pr-4 sm:pr-6"
+                >
+                  <div className="relative aspect-[4/5] w-[220px] overflow-hidden border-2 border-motif-ivory bg-motif-ivory shadow-[8px_8px_0_var(--color-motif-red)] sm:w-[300px] lg:w-[340px]">
+                    <Image
+                      src={item.src}
+                      alt={isClone ? "" : item.alt}
+                      aria-hidden={isClone || undefined}
+                      fill
+                      sizes="(max-width: 640px) 220px, (max-width: 1024px) 300px, 340px"
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mx-auto mt-14 max-w-[96rem] px-4 sm:px-8 lg:px-12">
+          <Reveal>
+            <p className="max-w-lg border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80 sm:text-lg sm:leading-8">
               Once your profile exists, search any object. Motif blends your
               visual DNA with live shopping results for the closest fit.
             </p>
             <PrimaryCta className="mt-8">Find my vibe</PrimaryCta>
-          </Reveal>
-
-          <Reveal delay={0.12} className="grid grid-cols-3 gap-3 sm:gap-4">
-            {productPreviews.map((item, index) => (
-              <div
-                key={item.src}
-                className={`relative aspect-[4/5] overflow-hidden border-2 border-motif-ivory bg-motif-ivory shadow-[5px_5px_0_var(--color-motif-red)] ${
-                  index === 1 ? "translate-y-4 sm:translate-y-6" : ""
-                }`}
-              >
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  sizes="(max-width: 1024px) 30vw, 12vw"
-                  className="object-cover"
-                />
-              </div>
-            ))}
           </Reveal>
         </div>
       </section>
@@ -343,10 +406,11 @@ export default function BoldHome() {
         />
         <Reveal className="relative mx-auto max-w-6xl border-2 border-motif-ivory bg-motif-black px-5 py-16 text-center shadow-[12px_12px_0_var(--color-motif-red)] sm:px-12 sm:py-24">
           <h2 className="text-5xl font-black uppercase leading-[0.8] tracking-[-0.06em] sm:text-7xl lg:text-8xl">
-            Stop saying
-            <span className="bodoniModa block font-normal italic normal-case text-motif-taupe">
-              “I&apos;ll know it when I see it.”
+            <span className="bodoniModa block font-normal italic normal-case text-motif-taupe mb-10">
+              Stop questioning
             </span>
+            Your taste
+
           </h2>
           <div className="mt-10 flex flex-col items-center">
             <Link

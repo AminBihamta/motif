@@ -66,9 +66,19 @@ body {
     animation: rotate-star 6s steps(16, end) infinite;
 }
 
+#product-marquee {
+    animation: scroll-left 45s linear infinite;
+    will-change: transform;
+}
+
+#product-marquee:hover {
+    animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
     #rotating-star,
-    #rotating-cd {
+    #rotating-cd,
+    #product-marquee {
         animation: none;
     }
 }
