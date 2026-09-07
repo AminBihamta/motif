@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
@@ -29,14 +28,7 @@ const loadingMessages = [
   "Almost done. Dramatic pause included...",
 ];
 
-type UsageDisplay = {
-  analysesRemaining: number;
-  searchesRemaining: number;
-  eligible: boolean;
-  isGuest: boolean;
-} | null;
-
-export default function UploadForm({ usage }: { usage: UsageDisplay }) {
+export default function UploadForm() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const hasNavigated = useRef(false);
@@ -189,19 +181,6 @@ export default function UploadForm({ usage }: { usage: UsageDisplay }) {
         })
       }
     >
-      {usage && (
-        <div className="mb-5 border-2 border-motif-blue bg-motif-black px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-motif-ivory">
-          {usage.eligible ? (
-            <span>
-              {usage.isGuest ? "Guest allowance" : "Member allowance"} — {usage.analysesRemaining} analysis{usage.analysesRemaining === 1 ? "" : "es"} + {usage.searchesRemaining} search{usage.searchesRemaining === 1 ? "" : "es"} left{usage.isGuest ? "" : " this week"}
-            </span>
-          ) : (
-            <span>
-              Verify your email to unlock five analyses and five searches per week. <Link href="/signin" className="text-motif-red underline underline-offset-2">Verify account</Link>
-            </span>
-          )}
-        </div>
-      )}
       <div className="mb-5 flex items-end justify-between gap-4 border-b-2 border-motif-ivory pb-4">
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-motif-taupe">Evidence collected</p>

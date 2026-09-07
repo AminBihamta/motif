@@ -180,7 +180,7 @@ export default function BoldHome() {
 
       <header className="relative z-30 flex min-h-16 items-stretch border-b-2 border-motif-ivory bg-motif-black">
         <Link
-          href="/dev-home"
+          href="/"
           className="group flex items-center border-r-2 border-motif-ivory px-5 transition-colors hover:bg-motif-ivory focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-red sm:px-8"
         >
           <MotifLogo
@@ -193,7 +193,7 @@ export default function BoldHome() {
         </p>
         <Link
           href="/find-my-vibe"
-          className="flex items-center border-l-2 border-motif-ivory bg-motif-red px-4 text-[10px] font-black uppercase tracking-[0.18em] transition-colors hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-black sm:px-6 sm:text-xs"
+          className="ml-auto flex items-center border-l-2 border-motif-ivory bg-motif-red px-4 text-[10px] font-black uppercase tracking-[0.18em] transition-colors hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-black sm:px-6 sm:text-xs"
         >
           Find my vibe ↗
         </Link>
@@ -223,24 +223,24 @@ export default function BoldHome() {
 
       <section className="relative z-10 border-b-2 border-motif-ivory bg-motif-blue px-4 py-16 text-motif-ivory sm:px-8 sm:py-20 lg:px-12">
         <div className="mx-auto max-w-[96rem]">
-          <Reveal className="grid gap-10 lg:grid-cols-[0.9fr_1.2fr] lg:items-center lg:gap-14">
+          <Reveal className="grid gap-8 lg:grid-cols-[0.75fr_1.45fr] lg:items-center lg:gap-4">
             <div>
               <p className="mb-5 text-xs font-black uppercase tracking-[0.24em] text-motif-ivory/70">
                 What Motif does
               </p>
-              <h2 className="max-w-xl text-4xl font-black uppercase leading-[0.88] tracking-[-0.05em] sm:text-6xl">
+              <h2 className="max-w-2xl text-4xl font-black uppercase leading-[0.88] tracking-[-0.05em] sm:text-6xl">
                 You know it when
                 <span className="bodoniModa mt-2 block font-normal italic normal-case text-motif-ivory">
                   you see it.
                 </span>
               </h2>
-              <p className="mt-6 max-w-md border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80">
+              <p className="mt-6 max-w-xl border-l-[6px] border-motif-red pl-5 text-base leading-7 text-motif-ivory/80">
                 You can spot what you like instantly, but never name it. Motif
                 reads six images you love and gives that instinct a name, a
                 color DNA, and a list of traits — so you can search for any
                 object and get results that actually look like you.
               </p>
-              <ul className="mt-8 max-w-md divide-y divide-motif-ivory/20 border-y border-motif-ivory/20">
+              <ul className="mt-8 max-w-xl divide-y divide-motif-ivory/20 border-y border-motif-ivory/20">
                 {profileOutputs.map((item) => (
                   <li key={item.title} className="py-3">
                     <p className="text-sm font-black uppercase tracking-[0.14em]">
@@ -261,20 +261,24 @@ export default function BoldHome() {
               </Link>
             </div>
 
-            <div>
-              <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
-                Sample result — Opulent Maximalism
-              </p>
-              <div className="relative overflow-hidden border-2 border-motif-black bg-motif-black shadow-[12px_12px_0_var(--color-motif-black)]">
-                <Image
-                  src="/assets/marketing/my-vibe-result.png"
-                  alt="Example Motif vibe results page showing Opulent Maximalism with color analysis and visual DNA"
-                  width={1600}
-                  height={1200}
-                  className="h-auto w-full"
-                  sizes="(max-width: 1024px) 100vw, 55vw"
-                />
-              </div>
+            <div className="relative w-full min-w-0 lg:scale-[1.18] lg:origin-left xl:scale-[1.22]">
+              <Image
+                src="/assets/marketing/my-vibe-phone.png"
+                alt="Phone showing an example Motif vibe results page for Opulent Maximalism"
+                width={603}
+                height={1176}
+                className="mx-auto h-auto w-[min(100%,22rem)] lg:hidden"
+                sizes="(max-width: 1024px) 22rem, 0px"
+              />
+              <Image
+                src="/assets/marketing/my-vibe-laptop.png"
+                alt="Laptop showing an example Motif vibe results page for Opulent Maximalism"
+                width={1920}
+                height={1440}
+                className="hidden h-auto w-full lg:block"
+                sizes="70vw"
+                priority
+              />
             </div>
           </Reveal>
         </div>

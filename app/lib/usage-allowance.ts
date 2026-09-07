@@ -39,6 +39,16 @@ const memberAnalysisAllowance = 5;
 const memberSearchAllowance = 5;
 const guestNetworkLimit = 5;
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const localUnlimitedRemaining = 999;
+const localUnlimitedReservationId = "00000000-0000-4000-8000-000000000000";
+const localUnlimitedAllowanceId = "00000000-0000-4000-8000-000000000001";
+
+function isLocalUnlimitedUsage() {
+  return (
+    process.env.NODE_ENV === "development" ||
+    process.env.MOTIF_UNLIMITED_USAGE === "1"
+  );
+}
 
 function normalizeIpPrefix(value: string | null) {
   const ip = value?.split(",")[0]?.trim() ?? "unknown";
@@ -241,6 +251,14 @@ export async function reserveUsage(
   kind: UsageKind,
   owner: { userId?: string; anonymousOwnerId?: string },
 ): Promise<UsageReservation> {
+  if (isLocalUnlimitedUsage()) {
+    return {
+      id: localUnlimitedReservationId,
+      allowanceId: localUnlimitedAllowanceId,
+      kind,
+    };
+  }
+
   const allowance = await getAllowance(owner.userId, owner.anonymousOwnerId);
   if (!allowance) throw new UsageAllowanceError("Your Motif allowance could not be loaded.");
   await releaseExpiredReservations(allowance.id);
@@ -285,6 +303,8 @@ export async function reserveUsage(
 }
 
 export async function commitUsage(reservation: UsageReservation) {
+  if (reservation.id === localUnlimitedReservationId) return;
+
   const sql = getDatabase();
   await sql`
     UPDATE public.motif_usage_reservations
@@ -296,6 +316,8 @@ export async function commitUsage(reservation: UsageReservation) {
 }
 
 export async function releaseUsage(reservation: UsageReservation) {
+  if (reservation.id === localUnlimitedReservationId) return;
+
   const sql = getDatabase();
   const remainingColumn = reservation.kind === "analysis"
     ? "analyses_remaining"
@@ -322,6 +344,15 @@ export async function releaseUsage(reservation: UsageReservation) {
 export async function getUsageSummary(
   owner: { userId?: string; anonymousOwnerId?: string },
 ): Promise<UsageSummary | null> {
+  if (isLocalUnlimitedUsage()) {
+    return {
+      analysesRemaining: localUnlimitedRemaining,
+      searchesRemaining: localUnlimitedRemaining,
+      eligible: true,
+      isGuest: !owner.userId,
+    };
+  }
+
   try {
     if (owner.userId) {
       const allowance = await getVerifiedAccountAllowance(owner.userId);
