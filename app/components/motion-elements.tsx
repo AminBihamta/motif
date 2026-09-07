@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import posthog from "posthog-js";
 import { useEffect, useRef, type ReactNode } from "react";
 import {
-  initPostHogIfAllowed,
+  initAnalyticsIfAllowed,
   isAnalyticsAllowed,
   isPostHogConfigured,
   subscribeAnalyticsConsent,
@@ -113,12 +113,10 @@ export function PostHogIdentity({ userId, email, name }: PostHogIdentityProps) {
   const identifiedUserId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isPostHogConfigured()) return;
-
     function syncIdentity() {
-      initPostHogIfAllowed();
+      initAnalyticsIfAllowed();
 
-      if (!isAnalyticsAllowed()) {
+      if (!isPostHogConfigured() || !isAnalyticsAllowed()) {
         identifiedUserId.current = null;
         return;
       }

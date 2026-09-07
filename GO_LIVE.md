@@ -89,7 +89,8 @@ Classify each signal before launch. Necessary cookies typically do not need mark
 | --- | --- | --- | --- |
 | `motif_anonymous_owner` | `app/lib/taste-profile.ts` | Necessary | HTTP-only, 1 year, `secure` in production; ties anonymous taste profile to the browser |
 | Auth.js session cookies | Auth.js / `auth.ts` | Necessary | JWT session for signed-in users |
-| PostHog cookies / local storage | `instrumentation-client.ts`, `app/lib/posthog.ts` | Analytics | Client analytics + `capture_exceptions`; requires consent strategy if regulated |
+| PostHog cookies / local storage | `app/lib/analytics-consent.ts` | Analytics | Opt-in only |
+| Google Analytics (`_ga` / `_ga_*`) | `app/lib/analytics-consent.ts` (`G-906SQMQT76`) | Analytics | Opt-in only; loaded after Accept |
 | Guest network HMAC | `app/lib/usage-allowance.ts` | Necessary (abuse) | Server-only hash using `MOTIF_ABUSE_HMAC_SECRET`; not stored as a browser cookie |
 
 - [x] Cookie notice / banner matches this inventory

@@ -21,8 +21,8 @@ export default function CookiesPage() {
         <h2>Overview</h2>
         <p>
           Motif uses necessary cookies so your taste profile and sign-in work.
-          Optional analytics (PostHog) run only if you opt in. Change your choice
-          anytime below or via the site banner. Contact{" "}
+          Optional analytics (Google Analytics and PostHog) run only if you opt
+          in. Change your choice anytime below or via the site banner. Contact{" "}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> with
           questions. See also our <Link href="/privacy">Privacy Policy</Link>.
         </p>
@@ -53,9 +53,16 @@ export default function CookiesPage() {
         <h2>Analytics (opt-in)</h2>
         <ul>
           <li>
+            <strong>Google Analytics (GA4)</strong> — traffic and engagement
+            measurement via measurement ID{" "}
+            <code className="text-motif-taupe">G-906SQMQT76</code> (or{" "}
+            <code className="text-motif-taupe">NEXT_PUBLIC_GA_MEASUREMENT_ID</code>
+            ). Loaded only after you Accept analytics.
+          </li>
+          <li>
             <strong>PostHog</strong> — product analytics and client exception
             capture. Loaded only after you Accept analytics. If you Reject, we
-            do not initialize PostHog in your browser.
+            do not initialize analytics tools in your browser.
           </li>
         </ul>
       </section>

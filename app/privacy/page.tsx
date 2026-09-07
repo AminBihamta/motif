@@ -69,8 +69,9 @@ export default function PrivacyPage() {
           <li>To send email verification via Brevo for email/password accounts.</li>
           <li>To perform taste-shaped product search and show Amazon results.</li>
           <li>
-            To measure product usage with PostHog <em>only after</em> you opt in
-            to analytics (see <Link href="/cookies">Cookies</Link>).
+            To measure product usage with Google Analytics and PostHog{" "}
+            <em>only after</em> you opt in to analytics (see{" "}
+            <Link href="/cookies">Cookies</Link>).
           </li>
         </ul>
       </section>
@@ -85,6 +86,10 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Auth.js session cookies</strong> — necessary if you sign in.
+          </li>
+          <li>
+            <strong>Google Analytics</strong> — analytics cookies only if you
+            Accept analytics.
           </li>
           <li>
             <strong>PostHog</strong> — analytics cookies / storage only if you
@@ -114,7 +119,7 @@ export default function PrivacyPage() {
           Depending on features you use, data may be processed by Vercel
           (hosting), Neon (database), Vercel Blob (image storage), OpenRouter
           (AI analysis), SearchApi (Amazon search), Brevo (email), Google
-          (OAuth), and PostHog (analytics, if consented).
+          (OAuth), Google Analytics, and PostHog (analytics, if consented).
         </p>
       </section>
 

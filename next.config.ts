@@ -45,9 +45,9 @@ const securityHeaders = [
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      // Next.js, BotID challenge proxy, and PostHog need script flexibility.
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-scripts.com https://*.vercel.live",
-      "connect-src 'self' https://*.i.posthog.com https://eu.i.posthog.com https://us.i.posthog.com https://accounts.google.com https://*.googleusercontent.com https://openrouter.ai https://*.public.blob.vercel-storage.com https://blob.vercel-storage.com https://api.vercel.com https://*.vercel.app",
+      // Next.js, BotID, PostHog, and Google Analytics need script flexibility.
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel-scripts.com https://*.vercel.live https://www.googletagmanager.com https://www.google-analytics.com",
+      "connect-src 'self' https://*.i.posthog.com https://eu.i.posthog.com https://us.i.posthog.com https://accounts.google.com https://*.googleusercontent.com https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com https://openrouter.ai https://*.public.blob.vercel-storage.com https://blob.vercel-storage.com https://api.vercel.com https://*.vercel.app",
       "frame-src 'self' https://accounts.google.com",
       "worker-src 'self' blob:",
       "upgrade-insecure-requests",

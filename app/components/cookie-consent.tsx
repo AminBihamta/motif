@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   getAnalyticsConsent,
-  initPostHogIfAllowed,
+  initAnalyticsIfAllowed,
   setAnalyticsConsent,
   subscribeAnalyticsConsent,
   type AnalyticsConsent,
@@ -19,13 +19,13 @@ export default function CookieConsent() {
     const current = getAnalyticsConsent();
     setPreference(current);
     if (current === "accepted") {
-      initPostHogIfAllowed();
+      initAnalyticsIfAllowed();
     }
 
     return subscribeAnalyticsConsent((value) => {
       setPreference(value);
       if (value === "accepted") {
-        initPostHogIfAllowed();
+        initAnalyticsIfAllowed();
       }
     });
   }, []);
@@ -47,8 +47,8 @@ export default function CookieConsent() {
           </p>
           <p className="mt-2 text-sm leading-6 text-motif-ivory/80 sm:text-base sm:leading-7">
             Motif uses necessary cookies for your taste profile and sign-in.
-            Optional analytics (PostHog) help us improve the product and only
-            run if you accept. Read our{" "}
+            Optional analytics (Google Analytics and PostHog) help us improve the
+            product and only run if you accept. Read our{" "}
             <Link
               href="/privacy"
               className="font-bold text-motif-ivory underline decoration-motif-red decoration-2 underline-offset-4"
