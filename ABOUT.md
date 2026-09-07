@@ -55,11 +55,11 @@ Development moved roughly in this order:
 
 ### Motif
 
-- **Live app:** [https://motif-iota.vercel.app](https://motif-iota.vercel.app)
+- **Live app:** [https://motif.aminbihamta.com](https://motif.aminbihamta.com)
 - **Source code:** [https://github.com/AminBihamta/motif](https://github.com/AminBihamta/motif)
-- **Find my vibe:** [https://motif-iota.vercel.app/find-my-vibe](https://motif-iota.vercel.app/find-my-vibe)
-- **Sign in / create account:** [https://motif-iota.vercel.app/signin](https://motif-iota.vercel.app/signin)
-- **Contact:** [https://motif-iota.vercel.app/contact](https://motif-iota.vercel.app/contact)
+- **Find my vibe:** [https://motif.aminbihamta.com/find-my-vibe](https://motif.aminbihamta.com/find-my-vibe)
+- **Sign in / create account:** [https://motif.aminbihamta.com/signin](https://motif.aminbihamta.com/signin)
+- **Contact:** [https://motif.aminbihamta.com/contact](https://motif.aminbihamta.com/contact)
 
 ### Local development
 

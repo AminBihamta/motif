@@ -49,19 +49,10 @@ function AllowanceInvite({ invite }: { invite: "signup" | "verify" }) {
           </span>
         </p>
         <p className="mt-3 max-w-xl text-sm leading-6 text-motif-ivory/70">
-          Verified accounts get five analyses and five product searches every
-          week.
+          Check your inbox for the Motif verification link. Once confirmed, you
+          get five analyses and five product searches every week. Google
+          accounts are verified automatically.
         </p>
-        <Link
-          href={signInHref}
-          className="group mt-5 inline-flex w-full items-center justify-between gap-4 border-2 border-motif-black bg-motif-red px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-transform hover:-translate-y-0.5 hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:w-auto sm:min-w-56"
-        >
-          Verify account
-          <ArrowRight
-            aria-hidden="true"
-            className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-          />
-        </Link>
       </div>
     );
   }

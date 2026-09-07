@@ -130,6 +130,18 @@ export async function markEmailVerified(userId: string) {
   `;
 }
 
+export async function markEmailVerifiedByEmail(rawEmail: string) {
+  const email = rawEmail.trim().toLowerCase();
+  if (!email) return;
+
+  const sql = getDatabase();
+  await sql`
+    UPDATE public.users
+    SET "emailVerified" = COALESCE("emailVerified", now())
+    WHERE lower(email) = ${email}
+  `;
+}
+
 export async function sendEmailVerificationForAddress(rawEmail: string) {
   const email = rawEmail.trim().toLowerCase();
   const sql = getDatabase();

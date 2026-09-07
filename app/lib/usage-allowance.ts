@@ -129,13 +129,32 @@ async function refreshMemberAllowanceIfNeeded(row: AllowanceRow): Promise<Allowa
 async function getVerifiedAccountAllowance(userId: string) {
   const sql = getDatabase();
   const users = await sql`
-    SELECT "emailVerified"
-    FROM public.users
-    WHERE id::text = ${userId}
+    SELECT
+      u."emailVerified",
+      EXISTS (
+        SELECT 1
+        FROM public.accounts a
+        WHERE a."userId" = u.id
+          AND a.provider = 'google'
+      ) AS signed_in_with_google
+    FROM public.users u
+    WHERE u.id::text = ${userId}
     LIMIT 1
-  ` as Array<{ emailVerified: unknown }>;
+  ` as Array<{ emailVerified: unknown; signed_in_with_google: boolean }>;
 
-  if (!users[0]?.emailVerified) {
+  const user = users[0];
+  if (!user) {
+    throw new UsageAllowanceError("A Motif owner is required.");
+  }
+
+  // Google OAuth accounts are treated as verified — no email link required.
+  if (!user.emailVerified && user.signed_in_with_google) {
+    await sql`
+      UPDATE public.users
+      SET "emailVerified" = COALESCE("emailVerified", now())
+      WHERE id::text = ${userId}
+    `;
+  } else if (!user.emailVerified) {
     throw new UsageAllowanceError(
       "Verify your email to unlock five analyses and five searches per week.",
       "unverified",

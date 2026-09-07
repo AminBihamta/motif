@@ -5,7 +5,10 @@ import Credentials from "next-auth/providers/credentials";
 import PostgresAdapter from "@auth/pg-adapter";
 import { claimAnonymousTasteProfile } from "./app/lib/taste-profile";
 import { authenticatePasswordUser } from "./app/lib/auth-users";
-import { markEmailVerified } from "./app/lib/email-verification";
+import {
+  markEmailVerified,
+  markEmailVerifiedByEmail,
+} from "./app/lib/email-verification";
 
 export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
   const connectionString = process.env.NEON_CONNECTION_STRING;
@@ -45,6 +48,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
 
           if (user.id) {
             await markEmailVerified(user.id);
+          } else if (user.email) {
+            await markEmailVerifiedByEmail(user.email);
           }
         }
 
@@ -77,6 +82,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
         }
 
         return session;
+      },
+    },
+    events: {
+      async linkAccount({ user, account }) {
+        if (account.provider === "google" && user.id) {
+          await markEmailVerified(user.id);
+        }
       },
     },
   };
