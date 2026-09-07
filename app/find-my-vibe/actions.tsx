@@ -120,7 +120,7 @@ export async function analyzeImages(
     if (error instanceof BotProtectionError) {
       return { status: "error", message: error.message };
     }
-    throw error;
+    console.error("Bot protection precheck failed:", error);
   }
 
   const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
