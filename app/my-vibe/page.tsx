@@ -1,9 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { auth } from "../../auth";
 import VibeResults from "../components/vibe-results";
 import ProductSearch from "../components/product-search";
+import SiteFooter from "../components/site-footer";
 import SiteHeader from "../components/site-header";
 import { AmbientDecor } from "../components/motion-elements";
 import { getAnonymousOwnerId, getTasteProfile } from "../lib/taste-profile";
@@ -55,20 +55,7 @@ export default async function MyVibe() {
         {tasteProfile && <ProductSearch usage={usage} />}
       </div>
 
-      <footer className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-motif-ivory/35 bg-motif-black px-5 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-motif-ivory/55 sm:px-10">
-        <div className="flex flex-wrap gap-4">
-          <Link href="/privacy" className="hover:text-motif-ivory">
-            Privacy
-          </Link>
-          <Link href="/terms" className="hover:text-motif-ivory">
-            Terms
-          </Link>
-          <Link href="/cookies" className="hover:text-motif-ivory">
-            Cookies
-          </Link>
-        </div>
-        <span>Motif © 2026</span>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

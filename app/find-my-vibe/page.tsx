@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import UploadForm from "../components/upload-form";
+import SiteFooter from "../components/site-footer";
 import SiteHeader from "../components/site-header";
 import { AmbientDecor, Reveal } from "../components/motion-elements";
 
@@ -61,11 +62,7 @@ export default function FindMyVibe() {
         </Reveal>
       </div>
 
-      <footer className="relative z-20 flex items-center justify-between border-t-2 border-motif-ivory bg-motif-red px-5 py-4 text-[9px] font-black uppercase tracking-[0.18em] sm:px-8 sm:text-[10px]">
-        <span>No right answers</span>
-        <span className="hidden sm:inline">Your images are analyzed together</span>
-        <span>Trust your eye</span>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

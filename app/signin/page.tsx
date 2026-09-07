@@ -4,6 +4,7 @@ import Link from "next/link";
 import AnimatedContainer from "../components/animated-container";
 import EmailPasswordForm from "../components/email-password-form";
 import GoogleSignInButton from "../components/google-sign-in-button";
+import SiteFooter from "../components/site-footer";
 import SiteHeader from "../components/site-header";
 
 export const metadata: Metadata = {
@@ -139,6 +140,8 @@ export default async function SignIn({
             </div>
           </aside>
         </div>
+
+        <SiteFooter />
       </main>
     </AnimatedContainer>
   );

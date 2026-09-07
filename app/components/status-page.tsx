@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "iconoir-react";
+import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
 
 export function StatusPage({
@@ -53,6 +54,8 @@ export function StatusPage({
           <div className="mt-10 flex flex-wrap items-center gap-4">{actions}</div>
         </div>
       </div>
+
+      <SiteFooter />
     </main>
   );
 }

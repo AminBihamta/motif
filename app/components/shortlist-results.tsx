@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import type { ProductSearchResult } from "../lib/product-search";
 import { capturePostHogEvent } from "../lib/posthog";
+import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
 
 type ShortlistProfile = {
@@ -179,20 +180,7 @@ export default function ShortlistResults({
           </section>
         )}
       </div>
-      <footer className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t-2 border-motif-ivory bg-motif-red px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] sm:px-10">
-        <div className="flex flex-wrap gap-4">
-          <Link href="/privacy" className="hover:underline">
-            Privacy
-          </Link>
-          <Link href="/terms" className="hover:underline">
-            Terms
-          </Link>
-          <Link href="/cookies" className="hover:underline">
-            Cookies
-          </Link>
-        </div>
-        <span>Motif © 2026</span>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
