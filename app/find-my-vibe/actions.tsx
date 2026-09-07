@@ -20,6 +20,10 @@ import {
   type UsageReservation,
 } from "../lib/usage-allowance";
 import { REQUIRED_IMAGE_COUNT } from "../lib/upload-constraints";
+import {
+  assertHumanRequest,
+  BotProtectionError,
+} from "../lib/bot-protection";
 
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
 const maxFileSize = 5 * 1024 * 1024;
@@ -110,6 +114,15 @@ export async function analyzeImages(
   _previousState: AnalyzeImagesState,
   formData: FormData,
 ): Promise<AnalyzeImagesState> {
+  try {
+    await assertHumanRequest();
+  } catch (error) {
+    if (error instanceof BotProtectionError) {
+      return { status: "error", message: error.message };
+    }
+    throw error;
+  }
+
   const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
   const OPENROUTER_MODEL =
     process.env.OPENROUTER_MODEL ??

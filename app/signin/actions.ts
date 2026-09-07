@@ -6,6 +6,10 @@ import {
   normalizeEmail,
 } from "../lib/auth-users";
 import {
+  assertHumanRequest,
+  BotProtectionError,
+} from "../lib/bot-protection";
+import {
   sendEmailVerification,
   sendEmailVerificationForAddress,
 } from "../lib/email-verification";
@@ -19,6 +23,15 @@ export async function registerAccount(
   _previousState: RegistrationState,
   formData: FormData,
 ): Promise<RegistrationState> {
+  try {
+    await assertHumanRequest();
+  } catch (error) {
+    if (error instanceof BotProtectionError) {
+      return { error: error.message };
+    }
+    throw error;
+  }
+
   const name = typeof formData.get("name") === "string"
     ? String(formData.get("name")).trim()
     : "";
@@ -82,6 +95,15 @@ export async function resendVerification(
   _previousState: RegistrationState,
   formData: FormData,
 ): Promise<RegistrationState> {
+  try {
+    await assertHumanRequest();
+  } catch (error) {
+    if (error instanceof BotProtectionError) {
+      return { error: error.message };
+    }
+    throw error;
+  }
+
   const email = typeof formData.get("email") === "string"
     ? String(formData.get("email"))
     : "";

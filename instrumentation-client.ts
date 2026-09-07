@@ -1,23 +1,14 @@
-import posthog from "posthog-js";
+// PostHog is initialized only after explicit analytics consent.
+// See app/lib/analytics-consent.ts and app/components/cookie-consent.tsx.
+import { initBotId } from "botid/client/core";
 
-const projectToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
-const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
-
-if (!projectToken || !host) {
-  if (process.env.NODE_ENV === "development") {
-    const missingVariable = projectToken
-      ? "NEXT_PUBLIC_POSTHOG_HOST"
-      : "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN";
-
-    throw new Error(
-      `${missingVariable} variable required by PostHog is missing or un-configured, this causes events to be silently missed. This error stops appearing once ${missingVariable} is configured`,
-    );
-  }
-} else {
-  posthog.init(projectToken, {
-    api_host: host,
-    defaults: "2026-01-30",
-    capture_exceptions: true,
-    debug: process.env.NODE_ENV === "development",
-  });
-}
+// Protect pages that invoke expensive / abuse-prone Server Actions.
+// The path is the page URL that posts the action, not the action file path.
+initBotId({
+  protect: [
+    { path: "/find-my-vibe", method: "POST" },
+    { path: "/my-vibe", method: "POST" },
+    { path: "/contact", method: "POST" },
+    { path: "/signin", method: "POST" },
+  ],
+});

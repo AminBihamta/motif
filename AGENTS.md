@@ -12,9 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Motif is a Next.js 16 App Router application that turns six user-selected
 images into an AI-generated visual taste profile. The public homepage at `/`
-is a minimal coming-soon page. The editorial “bold” homepage lives at
-`/dev-home`; `/home-original` is an older visual homepage concept that remains
-available for comparison.
+is the editorial conversion page that drives visitors to `/find-my-vibe`.
 
 ## Important conventions
 
@@ -37,8 +35,8 @@ available for comparison.
 
 ## Application flow
 
-1. `/` renders a minimal coming-soon homepage. `/dev-home` renders the editorial
-   conversion homepage that drives visitors to `/find-my-vibe`.
+1. `/` renders the editorial conversion homepage that drives visitors to
+   `/find-my-vibe`.
 2. `/find-my-vibe` renders `UploadForm`. The client accepts exactly six JPG or
    PNG files, validates each at 5 MB or less, supports individual and bulk
    selection plus drag/drop, and shows local previews.

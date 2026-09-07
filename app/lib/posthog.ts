@@ -1,16 +1,21 @@
 "use client";
 
 import posthog from "posthog-js";
-
-const isPostHogConfigured = Boolean(
-  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN && process.env.NEXT_PUBLIC_POSTHOG_HOST,
-);
+import {
+  initPostHogIfAllowed,
+  isAnalyticsAllowed,
+  isPostHogConfigured,
+} from "./analytics-consent";
 
 export function capturePostHogEvent(
   event: string,
   properties?: Record<string, boolean | number | string>,
 ) {
-  if (isPostHogConfigured) {
+  if (!isPostHogConfigured()) return;
+
+  initPostHogIfAllowed();
+
+  if (isAnalyticsAllowed()) {
     posthog.capture(event, properties);
   }
 }

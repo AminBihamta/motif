@@ -257,7 +257,6 @@ export default function ProductSearch({
     initialProductSearchState,
   );
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const products = Array.isArray(state?.products) ? state.products : [];
   const statusMessage =
     typeof state?.message === "string"
       ? state.message
@@ -386,9 +385,9 @@ export default function ProductSearch({
         </div>
       </div>
 
-      {products.length > 0 && (
+      {state?.status === "success" && (
         <p className="relative mt-8 border-t-2 border-motif-black pt-5 text-sm font-bold uppercase tracking-[0.1em] text-motif-ivory/85">
-          Signal found. Opening your visual shortlist...
+          Signal locked. Opening your visual shortlist...
         </p>
       )}
     </section>

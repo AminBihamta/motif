@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import type { ProductSearchResult } from "../lib/product-search";
 import { capturePostHogEvent } from "../lib/posthog";
-import MotifLogo from "./motif-logo";
+import SiteHeader from "./site-header";
 
 type ShortlistProfile = {
   vibeName: string;
@@ -17,7 +17,6 @@ type ShortlistResultsProps = {
   query: string;
   products: ProductSearchResult[];
   tasteProfile: ShortlistProfile | null;
-  userName: string | null;
   errorMessage?: string;
 };
 
@@ -34,7 +33,7 @@ function ProductCard({
     <motion.a
       href={product.link}
       target="_blank"
-      rel="noopener noreferrer sponsored"
+      rel="noopener noreferrer"
       onClick={() =>
         capturePostHogEvent("product_result_opened", {
           result_position: index + 1,
@@ -76,7 +75,6 @@ function ProductCard({
         </h2>
         <div className="mt-3 flex flex-wrap gap-2 text-[9px] font-black uppercase tracking-[0.14em]">
           {product.isPrime && <span className="border border-motif-blue px-2 py-1 text-motif-blue">Prime</span>}
-          {product.isSponsored && <span className="border border-motif-red px-2 py-1 text-motif-red">Sponsored</span>}
           {product.availability && <span className="border border-motif-black px-2 py-1 text-motif-black/70">{product.availability}</span>}
         </div>
         <div className="mt-auto flex items-end justify-between gap-3 pt-8">
@@ -100,7 +98,6 @@ export default function ShortlistResults({
   query,
   products,
   tasteProfile,
-  userName,
   errorMessage,
 }: ShortlistResultsProps) {
   const reduceMotion = useReducedMotion();
@@ -110,13 +107,7 @@ export default function ShortlistResults({
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:42px_42px]" />
 
-      <header className="relative z-10 mx-3 mt-3 flex items-stretch justify-between border-2 border-motif-ivory bg-motif-black sm:mx-5 sm:mt-5">
-        <Link href="/my-vibe" className="group flex items-center border-r-2 border-motif-ivory px-4 py-3 transition-colors hover:bg-motif-ivory sm:px-7">
-          <MotifLogo className="h-6 w-auto transition group-hover:brightness-0 sm:h-7" priority />
-        </Link>
-        <p className="hidden items-center px-6 text-[10px] uppercase tracking-[0.32em] text-motif-taupe md:flex">{userName ? `For ${userName} / the object edit` : "The object edit / live signal"}</p>
-        <Link href="/my-vibe" className="flex items-center border-l-2 border-motif-ivory bg-motif-red px-4 text-xs font-bold uppercase tracking-[0.16em] transition-colors hover:bg-motif-ivory hover:text-motif-red sm:px-7 sm:text-sm">New search ↗</Link>
-      </header>
+      <SiteHeader priority />
 
       <div className="relative z-10 mx-auto w-full max-w-[96rem] px-5 pb-24 pt-16 sm:px-10 sm:pt-24 lg:px-16 lg:pt-32">
         <motion.div initial={{ opacity: 0, y: reduceMotion ? 0 : 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.7 }} className="grid gap-10 border-b-2 border-motif-ivory pb-12 lg:grid-cols-[1fr_22rem] lg:items-end">
@@ -188,7 +179,20 @@ export default function ShortlistResults({
           </section>
         )}
       </div>
-      <footer className="relative z-10 flex items-center justify-between border-t-2 border-motif-ivory bg-motif-red px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] sm:px-10"><span>Your taste, translated</span><span>Motif © 2026</span></footer>
+      <footer className="relative z-10 flex flex-wrap items-center justify-between gap-3 border-t-2 border-motif-ivory bg-motif-red px-5 py-4 text-[10px] font-bold uppercase tracking-[0.2em] sm:px-10">
+        <div className="flex flex-wrap gap-4">
+          <Link href="/privacy" className="hover:underline">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:underline">
+            Terms
+          </Link>
+          <Link href="/cookies" className="hover:underline">
+            Cookies
+          </Link>
+        </div>
+        <span>Motif © 2026</span>
+      </footer>
     </main>
   );
 }

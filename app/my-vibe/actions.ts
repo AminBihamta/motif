@@ -1,18 +1,13 @@
 "use server";
 
 import { auth } from "../../auth";
+import {
+  assertHumanRequest,
+  BotProtectionError,
+} from "../lib/bot-protection";
 import { getAnonymousOwnerId, getTasteProfile } from "../lib/taste-profile";
-import {
-  searchTasteShapedProducts,
-  type ProductSearchResult,
-} from "../lib/product-search";
-import {
-  commitUsage,
-  releaseUsage,
-  reserveUsage,
-  UsageAllowanceError,
-  type UsageReservation,
-} from "../lib/usage-allowance";
+import { getUsageSummary } from "../lib/usage-allowance";
+import type { ProductSearchResult } from "../lib/product-search";
 
 export type ProductSearchState = {
   status: "idle" | "success" | "error";
@@ -37,6 +32,20 @@ export async function searchProducts(
     };
   }
 
+  try {
+    await assertHumanRequest();
+  } catch (error) {
+    if (error instanceof BotProtectionError) {
+      return {
+        status: "error",
+        message: error.message,
+        query,
+        products: [],
+      };
+    }
+    throw error;
+  }
+
   const session = await auth();
   const tasteProfile = await getTasteProfile(session?.user?.id);
 
@@ -49,21 +58,20 @@ export async function searchProducts(
     };
   }
 
-  let usageReservation: UsageReservation | null = null;
-
   try {
-    usageReservation = await reserveUsage("search", {
+    const usage = await getUsageSummary({
       userId: session?.user?.id,
-      anonymousOwnerId: session?.user?.id ? undefined : await getAnonymousOwnerId(),
+      anonymousOwnerId: session?.user?.id
+        ? undefined
+        : await getAnonymousOwnerId(),
     });
-    const products = await searchTasteShapedProducts(query, tasteProfile);
-    await commitUsage(usageReservation);
-    usageReservation = null;
 
-    if (products.length === 0) {
+    if (!usage || usage.searchesRemaining < 1) {
       return {
         status: "error",
-        message: "No matches surfaced. Try a broader object name.",
+        message: session?.user?.id
+          ? "You have used this week’s searches. Your allowance refreshes in up to seven days."
+          : "You have used your free searches. Sign in or verify your account to continue.",
         query,
         products: [],
       };
@@ -71,29 +79,12 @@ export async function searchProducts(
 
     return {
       status: "success",
-      message: `${products.length} taste-shaped Amazon matches for “${query}”.`,
+      message: "Opening your visual shortlist...",
       query,
-      products,
+      products: [],
     };
   } catch (error) {
-    if (usageReservation) {
-      try {
-        await releaseUsage(usageReservation);
-      } catch (releaseError) {
-        console.error("Could not restore search allowance:", releaseError);
-      }
-    }
-
-    if (error instanceof UsageAllowanceError) {
-      return {
-        status: "error",
-        message: error.message,
-        query,
-        products: [],
-      };
-    }
-
-    console.error("Product search failed:", error);
+    console.error("Product search precheck failed:", error);
 
     return {
       status: "error",

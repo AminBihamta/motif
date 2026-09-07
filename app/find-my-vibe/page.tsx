@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import UploadForm from "../components/upload-form";
-import MotifLogo from "../components/motif-logo";
+import SiteHeader from "../components/site-header";
 import { AmbientDecor, Reveal } from "../components/motion-elements";
 
 export const metadata: Metadata = {
-  title: "Find My Vibe — Motif",
+  title: "Find my vibe",
   description: "Upload six images and decode your personal visual taste.",
+  alternates: {
+    canonical: "/find-my-vibe",
+  },
 };
 
 export default function FindMyVibe() {
@@ -23,11 +25,7 @@ export default function FindMyVibe() {
         <Image src="/assets/star.png" alt="" width={240} height={240} className="w-52 -rotate-12 opacity-80" />
       </AmbientDecor>
 
-      <header className="relative z-30 flex min-h-16 items-stretch border-b-2 border-motif-ivory bg-motif-black">
-        <Link href="/" className="group flex items-center border-r-2 border-motif-ivory px-5 transition-colors hover:bg-motif-ivory focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-motif-red sm:px-8">
-          <MotifLogo className="h-7 w-auto transition group-hover:brightness-0 sm:h-8" priority />
-        </Link>
-      </header>
+      <SiteHeader priority />
 
       <div className="relative z-10 mx-auto grid min-h-[calc(100svh-4rem)] max-w-[96rem] gap-14 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-12 lg:gap-8 lg:px-12 lg:py-20">
         <Reveal className="flex flex-col justify-between lg:col-span-5">

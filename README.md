@@ -19,9 +19,7 @@ saved visual evidence, and optional taste-shaped shopping results.
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Minimal coming-soon homepage |
-| `/dev-home` | Editorial homepage concept |
-| `/home-original` | Older homepage concept kept for comparison |
+| `/` | Editorial conversion homepage |
 | `/find-my-vibe` | Six-image upload and analysis form |
 | `/my-vibe` | Server-rendered profile and saved evidence gallery |
 | `/api/taste-images/:id` | Owner-checked private image proxy |
@@ -126,9 +124,7 @@ analysis, and up to six ordered image records per profile.
 
 ```text
 app/
-  page.tsx                         default homepage entrypoint
-  dev-home/                        editorial homepage concept (dev)
-  home-original/                   legacy homepage concept
+  page.tsx                         editorial homepage
   find-my-vibe/                    upload page and analysis Server Action
   my-vibe/                         result page and product-search Server Action
   components/                      shared UI, upload, results, and Motion code

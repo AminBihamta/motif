@@ -3,10 +3,12 @@
 import { motion, useReducedMotion } from "motion/react";
 import posthog from "posthog-js";
 import { useEffect, useRef, type ReactNode } from "react";
-
-const isPostHogConfigured = Boolean(
-  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN && process.env.NEXT_PUBLIC_POSTHOG_HOST,
-);
+import {
+  initPostHogIfAllowed,
+  isAnalyticsAllowed,
+  isPostHogConfigured,
+  subscribeAnalyticsConsent,
+} from "../lib/analytics-consent";
 
 type MotionElementProps = {
   children: ReactNode;
@@ -111,27 +113,41 @@ export function PostHogIdentity({ userId, email, name }: PostHogIdentityProps) {
   const identifiedUserId = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!isPostHogConfigured) return;
+    if (!isPostHogConfigured()) return;
 
-    if (!userId) {
-      if (identifiedUserId.current) {
-        posthog.reset();
+    function syncIdentity() {
+      initPostHogIfAllowed();
+
+      if (!isAnalyticsAllowed()) {
         identifiedUserId.current = null;
+        return;
       }
-      return;
+
+      if (!userId) {
+        if (identifiedUserId.current) {
+          posthog.reset();
+          identifiedUserId.current = null;
+        }
+        return;
+      }
+
+      if (identifiedUserId.current && identifiedUserId.current !== userId) {
+        posthog.reset();
+      }
+
+      if (identifiedUserId.current !== userId) {
+        posthog.identify(userId, {
+          ...(email ? { email } : {}),
+          ...(name ? { name } : {}),
+        });
+        identifiedUserId.current = userId;
+      }
     }
 
-    if (identifiedUserId.current && identifiedUserId.current !== userId) {
-      posthog.reset();
-    }
-
-    if (identifiedUserId.current !== userId) {
-      posthog.identify(userId, {
-        ...(email ? { email } : {}),
-        ...(name ? { name } : {}),
-      });
-      identifiedUserId.current = userId;
-    }
+    syncIdentity();
+    return subscribeAnalyticsConsent(() => {
+      syncIdentity();
+    });
   }, [email, name, userId]);
 
   return null;
