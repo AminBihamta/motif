@@ -12,8 +12,14 @@ import { capturePostHogEvent } from "../lib/posthog";
 
 const initialRegistrationState: RegistrationState = {};
 
-export default function EmailPasswordForm({ callbackUrl }: { callbackUrl: string }) {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+export default function EmailPasswordForm({
+  callbackUrl,
+  initialMode = "signin",
+}: {
+  callbackUrl: string;
+  initialMode?: "signin" | "signup";
+}) {
+  const [mode, setMode] = useState<"signin" | "signup">(initialMode);
   const [signInError, setSignInError] = useState("");
   const [pending, setPending] = useState(false);
   const [registrationState, registrationAction, registrationPending] = useActionState(

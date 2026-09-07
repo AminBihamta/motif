@@ -7,9 +7,11 @@ export type VibeAnalysis = {
   searchQuery: string;
 };
 
+export type AnalyzeImagesInvite = "signup" | "verify";
+
 export type AnalyzeImagesState =
   | { status: "idle" }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; invite?: AnalyzeImagesInvite }
   | { status: "success"; analysis: VibeAnalysis };
 
 function isStringArray(value: unknown): value is string[] {

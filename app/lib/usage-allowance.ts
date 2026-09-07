@@ -20,10 +20,20 @@ export type UsageSummary = {
   isGuest: boolean;
 };
 
+export type UsageAllowanceErrorCode =
+  | "guest_exhausted"
+  | "unverified"
+  | "member_exhausted"
+  | "guest_network_limited"
+  | "generic";
+
 export class UsageAllowanceError extends Error {
-  constructor(message: string) {
+  readonly code: UsageAllowanceErrorCode;
+
+  constructor(message: string, code: UsageAllowanceErrorCode = "generic") {
     super(message);
     this.name = "UsageAllowanceError";
+    this.code = code;
   }
 }
 
@@ -128,6 +138,7 @@ async function getVerifiedAccountAllowance(userId: string) {
   if (!users[0]?.emailVerified) {
     throw new UsageAllowanceError(
       "Verify your email to unlock five analyses and five searches per week.",
+      "unverified",
     );
   }
 
@@ -190,7 +201,10 @@ async function getGuestAllowance(anonymousOwnerId: string) {
   `;
 
   if (windowRows.length === 0) {
-    throw new UsageAllowanceError("Guest access is temporarily limited on this network. Sign in to continue.");
+    throw new UsageAllowanceError(
+      "Guest access is temporarily limited on this network. Sign in to continue.",
+      "guest_network_limited",
+    );
   }
 
   await sql`
@@ -289,6 +303,7 @@ export async function reserveUsage(
         kind === "analysis"
           ? "You have used this week’s analyses. Your allowance refreshes in up to seven days."
           : "You have used this week’s searches. Your allowance refreshes in up to seven days.",
+        "member_exhausted",
       );
     }
 
@@ -296,6 +311,7 @@ export async function reserveUsage(
       kind === "analysis"
         ? "You have used your free analyses. Sign in or verify your account to continue."
         : "You have used your free searches. Sign in or verify your account to continue.",
+      "guest_exhausted",
     );
   }
 

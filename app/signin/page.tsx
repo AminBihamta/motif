@@ -17,7 +17,11 @@ export const metadata: Metadata = {
 export default async function SignIn({
   searchParams,
 }: {
-  searchParams: Promise<{ callbackUrl?: string | string[]; verification?: string | string[] }>;
+  searchParams: Promise<{
+    callbackUrl?: string | string[];
+    verification?: string | string[];
+    mode?: string | string[];
+  }>;
 }) {
   const params = await searchParams;
   const callbackUrl = Array.isArray(params.callbackUrl)
@@ -29,6 +33,8 @@ export default async function SignIn({
   const verification = Array.isArray(params.verification)
     ? params.verification[0]
     : params.verification;
+  const modeParam = Array.isArray(params.mode) ? params.mode[0] : params.mode;
+  const initialMode = modeParam === "signup" ? "signup" : "signin";
 
   return (
     <AnimatedContainer>
@@ -73,7 +79,10 @@ export default async function SignIn({
                 </p>
               )}
 
-              <EmailPasswordForm callbackUrl={safeCallbackUrl} />
+              <EmailPasswordForm
+                callbackUrl={safeCallbackUrl}
+                initialMode={initialMode}
+              />
 
               <p className="mt-6 text-[10px] font-bold uppercase leading-5 tracking-[0.12em] text-motif-charcoal/60">
                 By continuing you agree to our{" "}

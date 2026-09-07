@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
@@ -15,6 +16,9 @@ const uploadSlots = Array.from({ length: REQUIRED_IMAGE_COUNT });
 const initialState: AnalyzeImagesState = { status: "idle" };
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
 const maxFileSize = 5 * 1024 * 1024;
+const findMyVibeCallback = encodeURIComponent("/find-my-vibe");
+const signInHref = `/signin?callbackUrl=${findMyVibeCallback}`;
+const signUpHref = `/signin?mode=signup&callbackUrl=${findMyVibeCallback}`;
 const loadingMessages = [
   "Reading the room...",
   "Connecting suspiciously tasteful dots...",
@@ -27,6 +31,84 @@ const loadingMessages = [
   "Translating vibes into actual words...",
   "Almost done. Dramatic pause included...",
 ];
+
+function AllowanceInvite({ invite }: { invite: "signup" | "verify" }) {
+  if (invite === "verify") {
+    return (
+      <div
+        role="status"
+        className="mt-4 border-2 border-motif-ivory bg-motif-black p-4 sm:p-5"
+      >
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
+          Verify to continue
+        </p>
+        <p className="mt-3 text-2xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-motif-ivory sm:text-3xl">
+          Unlock five a week.
+          <span className="bodoniModa mt-1 block font-normal italic normal-case tracking-normal text-motif-taupe">
+            Confirm your email.
+          </span>
+        </p>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-motif-ivory/70">
+          Verified accounts get five analyses and five product searches every
+          week.
+        </p>
+        <Link
+          href={signInHref}
+          className="group mt-5 inline-flex w-full items-center justify-between gap-4 border-2 border-motif-black bg-motif-red px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-transform hover:-translate-y-0.5 hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:w-auto sm:min-w-56"
+        >
+          Verify account
+          <ArrowRight
+            aria-hidden="true"
+            className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+          />
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      role="status"
+      className="mt-4 border-2 border-motif-ivory bg-motif-black p-4 sm:p-5"
+    >
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
+        Free decode used
+      </p>
+      <p className="mt-3 text-2xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-motif-ivory sm:text-3xl">
+        Your taste deserves
+        <span className="bodoniModa mt-1 block font-normal italic normal-case tracking-normal text-motif-taupe">
+          a longer shelf life.
+        </span>
+      </p>
+      <p className="mt-3 max-w-xl text-sm leading-6 text-motif-ivory/70">
+        Create a free account for five analyses and five product searches every
+        week — then decode again with the images you already chose.
+      </p>
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <Link
+          href={signUpHref}
+          className="group inline-flex items-center justify-between gap-4 border-2 border-motif-black bg-motif-red px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-transform hover:-translate-y-0.5 hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:min-w-56"
+        >
+          Create account
+          <ArrowRight
+            aria-hidden="true"
+            className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+          />
+        </Link>
+        <Link
+          href={signInHref}
+          className="group inline-flex items-center justify-between gap-4 border-2 border-motif-ivory bg-transparent px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-colors hover:bg-motif-ivory hover:text-motif-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:min-w-44"
+        >
+          Sign in
+          <ArrowRight
+            aria-hidden="true"
+            className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+          />
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function UploadForm() {
   const router = useRouter();
@@ -335,10 +417,23 @@ export default function UploadForm() {
 
       <div aria-live="polite">
         {dropError && (
-          <p className="mt-4 border-2 border-motif-red bg-motif-black px-4 py-3 text-sm font-bold text-motif-ivory"><span className="mr-2 text-motif-red">Drop error /</span>{dropError}</p>
+          <p
+            role="alert"
+            className="mt-4 border-l-4 border-motif-red bg-motif-black/80 px-4 py-3 text-sm font-bold leading-6 text-motif-ivory"
+          >
+            {dropError}
+          </p>
         )}
-        {state.status === "error" && (
-          <p className="mt-4 border-2 border-motif-red bg-motif-black px-4 py-3 text-sm font-bold text-motif-ivory"><span className="mr-2 text-motif-red">Error /</span>{state.message}</p>
+        {state.status === "error" && state.invite && (
+          <AllowanceInvite invite={state.invite} />
+        )}
+        {state.status === "error" && !state.invite && (
+          <p
+            role="alert"
+            className="mt-4 border-l-4 border-motif-red bg-motif-black/80 px-4 py-3 text-sm font-bold leading-6 text-motif-ivory"
+          >
+            {state.message}
+          </p>
         )}
       </div>
     </form>

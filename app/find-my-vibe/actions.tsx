@@ -6,6 +6,7 @@ import { del, put } from "@vercel/blob";
 import { auth } from "../../auth";
 import {
   isVibeAnalysis,
+  type AnalyzeImagesInvite,
   type AnalyzeImagesState,
 } from "../lib/vibe-analysis";
 import {
@@ -17,6 +18,7 @@ import {
   releaseUsage,
   reserveUsage,
   UsageAllowanceError,
+  type UsageAllowanceErrorCode,
   type UsageReservation,
 } from "../lib/usage-allowance";
 import { REQUIRED_IMAGE_COUNT } from "../lib/upload-constraints";
@@ -27,6 +29,20 @@ import {
 
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
 const maxFileSize = 5 * 1024 * 1024;
+
+function inviteForAllowanceCode(
+  code: UsageAllowanceErrorCode,
+): AnalyzeImagesInvite | undefined {
+  if (code === "guest_exhausted" || code === "guest_network_limited") {
+    return "signup";
+  }
+
+  if (code === "unverified") {
+    return "verify";
+  }
+
+  return undefined;
+}
 
 async function deleteBlobs(pathnames: string[], context: string) {
   if (pathnames.length === 0) return;
@@ -385,7 +401,11 @@ export async function analyzeImages(
     }
 
     if (error instanceof UsageAllowanceError) {
-      return { status: "error", message: error.message };
+      return {
+        status: "error",
+        message: error.message,
+        invite: inviteForAllowanceCode(error.code),
+      };
     }
 
     console.error("Image analysis failed:", error);
