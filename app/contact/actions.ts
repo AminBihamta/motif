@@ -13,8 +13,9 @@ export type ContactFormState =
 const SUCCESS_MESSAGE =
   "Thank you for your enquiry, I’ll get back to you as soon as possible!";
 
-const DEFAULT_FORM_URL = "https://aminbihamta.com/api/form-submissions";
-const DEFAULT_FORM_ID = 4;
+// Portfolio exposes a trusted submit route; direct /api/form-submissions create is locked.
+const DEFAULT_FORM_SUBMIT_URL =
+  "https://aminbihamta.com/api/forms/motif/submit";
 
 function readField(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -53,33 +54,18 @@ export async function submitContactForm(
   }
 
   const formUrl =
-    process.env.MOTIF_CONTACT_FORM_URL?.trim() || DEFAULT_FORM_URL;
-  const formId = Number(
-    process.env.MOTIF_CONTACT_FORM_ID?.trim() || DEFAULT_FORM_ID,
-  );
-
-  if (!Number.isFinite(formId)) {
-    return {
-      status: "error",
-      message: "Contact form is misconfigured. Please try again later.",
-    };
-  }
+    process.env.MOTIF_CONTACT_FORM_URL?.trim() || DEFAULT_FORM_SUBMIT_URL;
 
   try {
+    // Field names must match the Payload form field `name` values on form slug "motif".
+    const payload = new FormData();
+    payload.set("Name", name);
+    payload.set("Email Address", email);
+    payload.set("Enquiry", enquiry);
+
     const response = await fetch(formUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        form: formId,
-        submissionData: [
-          { field: "Name", value: name },
-          { field: "Email Address", value: email },
-          { field: "Enquiry", value: enquiry },
-        ],
-      }),
+      body: payload,
       cache: "no-store",
     });
 

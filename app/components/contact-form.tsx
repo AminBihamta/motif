@@ -31,7 +31,7 @@ export default function ContactForm() {
   return (
     <form action={formAction} className="space-y-5">
       <label className="block">
-        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-red">
+        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-ivory">
           Name
         </span>
         <input
@@ -46,7 +46,7 @@ export default function ContactForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-red">
+        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-ivory">
           Email Address
         </span>
         <input
@@ -61,7 +61,7 @@ export default function ContactForm() {
       </label>
 
       <label className="block">
-        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-red">
+        <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em] text-motif-ivory">
           Enquiry
         </span>
         <textarea

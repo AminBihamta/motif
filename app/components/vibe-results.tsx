@@ -71,14 +71,8 @@ export default function VibeResults({
 
   if (!analysis) {
     return (
-      <Reveal className="relative mx-auto flex min-h-[68vh] max-w-4xl flex-col justify-center border-x-2 border-motif-ivory px-6 py-20 sm:px-12">
-        <span className="absolute right-4 top-4 bg-motif-blue px-3 py-1 text-xs font-bold uppercase tracking-[0.2em]">
-          Error 404 / taste
-        </span>
-        <p className="text-xs font-bold uppercase tracking-[0.32em] text-motif-red">
-          No signal detected
-        </p>
-        <h1 className="mt-4 text-6xl font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-8xl lg:text-9xl">
+      <Reveal className="relative mx-auto flex min-h-[68vh] w-full max-w-6xl flex-col justify-center border-x-2 border-motif-ivory px-6 py-20 sm:px-12 lg:px-16">
+        <h1 className="text-6xl font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-8xl lg:text-9xl">
           Your vibe is
           <span className="bodoniModa block font-normal italic text-motif-ivory">
             still hiding.
