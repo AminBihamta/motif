@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "iconoir-react";
 import HeroCollage from "./components/hero-collage";
+import HomepageVideoScroll from "./components/homepage-video-scroll";
 import { Reveal } from "./components/motion-elements";
 import SiteFooter from "./components/site-footer";
 import SiteHeader from "./components/site-header";
@@ -247,6 +248,8 @@ export default function BoldHome() {
           <HeroCollage pools={[...heroCollagePools]} />
         </div>
       </section>
+
+      <HomepageVideoScroll />
 
       <section className="relative z-10 border-b-2 border-motif-ivory bg-motif-blue px-4 py-16 text-motif-ivory sm:px-8 sm:py-20 lg:px-12">
         <div className="mx-auto max-w-[96rem]">
