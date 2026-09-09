@@ -72,7 +72,7 @@ export default function VibeResults({
   if (!analysis) {
     return (
       <Reveal className="relative mx-auto flex min-h-[68vh] w-full max-w-6xl flex-col justify-center border-x-2 border-motif-ivory px-6 py-20 sm:px-12 lg:px-16">
-        <h1 className="text-6xl font-black uppercase leading-[0.8] tracking-[-0.07em] sm:text-8xl lg:text-9xl">
+        <h1 className="max-w-full break-words text-[clamp(2.75rem,12vw,9rem)] font-black uppercase leading-[0.8] tracking-[-0.07em]">
           Your vibe is
           <span className="bodoniModa block font-normal italic text-motif-ivory">
             still hiding.
@@ -94,33 +94,33 @@ export default function VibeResults({
   }
 
   return (
-    <div>
-      <Reveal className="relative grid gap-12 lg:grid-cols-12 lg:gap-5">
-        <div className="lg:col-span-9">
+    <div className="min-w-0 overflow-x-clip">
+      <Reveal className="relative grid min-w-0 gap-12 lg:grid-cols-12 lg:gap-5">
+        <div className="min-w-0 lg:col-span-9">
           <div className="mb-5 flex items-center gap-3">
-            <span className="bg-motif-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">
+            <span className="shrink-0 bg-motif-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">
               Analysis complete
             </span>
-            <span className="h-px flex-1 bg-motif-ivory/35" />
+            <span className="h-px min-w-0 flex-1 bg-motif-ivory/35" />
           </div>
 
-          <h1 className="text-[4rem] font-black uppercase leading-[0.75] tracking-[-0.075em] sm:text-[6.5rem] lg:text-[8.5rem]">
+          <h1 className="max-w-full text-[clamp(2.75rem,12vw,8.5rem)] font-black uppercase leading-[0.8] tracking-[-0.075em]">
             You&apos;re
             <br />
             giving
-            <span className="bodoniModa relative mt-4 block w-fit max-w-full rotate-[-1deg] bg-motif-red px-3 pb-3 pt-1 font-normal normal-case leading-[0.82] tracking-[-0.06em] text-motif-ivory sm:px-5">
+            <span className="bodoniModa relative mt-4 block w-full max-w-full break-words bg-motif-red px-3 pb-3 pt-1 font-normal normal-case leading-[0.9] tracking-[-0.04em] text-motif-ivory sm:mt-4 sm:w-fit sm:rotate-[-1deg] sm:px-5 sm:leading-[0.82] sm:tracking-[-0.06em]">
               {analysis.vibeName}
             </span>
           </h1>
         </div>
 
-        <aside className="relative self-end border-2 border-motif-ivory bg-motif-ivory p-3 text-motif-black shadow-[10px_10px_0_var(--color-motif-blue)] lg:col-span-3 lg:rotate-2">
+        <aside className="relative min-w-0 w-full max-w-full self-end border-2 border-motif-ivory bg-motif-ivory p-3 text-motif-black shadow-[6px_6px_0_var(--color-motif-blue)] sm:shadow-[10px_10px_0_var(--color-motif-blue)] lg:col-span-3 lg:rotate-2">
           <div className="mb-3 border-b-2 border-motif-black pb-2">
             <h2 className="text-xs font-black uppercase tracking-[0.18em]">
               Color analysis
             </h2>
           </div>
-          <div>
+          <div className="min-w-0">
             {analysis.colors.slice(0, 5).map((color, index) => {
               const hex = colorToHex(color);
               const label = colorLabel(color);
@@ -128,15 +128,15 @@ export default function VibeResults({
               return (
                 <div
                   key={`${color}-${index}`}
-                  className="grid grid-cols-[3rem_1fr] items-stretch border-b border-motif-black last:border-b-0"
+                  className="grid min-w-0 grid-cols-[3rem_minmax(0,1fr)] items-stretch border-b border-motif-black last:border-b-0"
                 >
                   <span
                     aria-hidden="true"
                     className="min-h-12 border-x border-motif-black"
                     style={{ backgroundColor: hex }}
                   />
-                  <span className="flex flex-col justify-center gap-0.5 px-3 py-2">
-                    <span className="text-sm font-bold uppercase leading-tight">
+                  <span className="flex min-w-0 flex-col justify-center gap-0.5 px-3 py-2">
+                    <span className="break-words text-sm font-bold uppercase leading-tight">
                       {label}
                     </span>
                     <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-motif-black/55">
@@ -149,26 +149,26 @@ export default function VibeResults({
           </div>
         </aside>
 
-        <div className="mt-6 lg:col-span-12 lg:mt-10">
-          <p className="w-full border-l-[6px] border-motif-blue pl-5 text-lg leading-8 text-motif-ivory/80">
+        <div className="mt-6 min-w-0 lg:col-span-12 lg:mt-10">
+          <p className="w-full max-w-full break-words border-l-[6px] border-motif-blue pl-4 text-base leading-7 text-motif-ivory/80 sm:pl-5 sm:text-lg sm:leading-8">
             {analysis.description}
           </p>
         </div>
       </Reveal>
 
-      <section className="relative mt-28 border-b border-motif-ivory pb-11 sm:mt-40">
+      <section className="relative mt-28 min-w-0 overflow-x-clip border-b border-motif-ivory pb-11 sm:mt-40">
         <div className="mb-8 flex items-center gap-3">
-          <span className="bg-motif-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">
+          <span className="shrink-0 bg-motif-red px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em]">
             The visual DNA
           </span>
-          <span className="h-px flex-1 bg-motif-ivory/35" />
+          <span className="h-px min-w-0 flex-1 bg-motif-ivory/35" />
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-6">
           {analysis.characteristics.map((characteristic, index) => (
             <TactileTag
               key={`${characteristic}-${index}`}
               delay={index * 0.06}
-              className="inline-block cursor-default border-2 border-motif-ivory bg-motif-charcoal px-5 py-3 text-lg font-bold uppercase text-motif-ivory shadow-[5px_5px_0_var(--color-motif-red)] sm:text-2xl"
+              className="inline-block max-w-full cursor-default break-words border-2 border-motif-ivory bg-motif-charcoal px-4 py-3 text-base font-bold uppercase text-motif-ivory shadow-[5px_5px_0_var(--color-motif-red)] sm:px-5 sm:text-2xl"
             >
               {characteristic}
             </TactileTag>

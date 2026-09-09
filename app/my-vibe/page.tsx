@@ -49,7 +49,7 @@ export default async function MyVibe() {
 
       <SiteHeader priority isSignedIn={Boolean(session?.user)} />
 
-      <div className="relative z-10 mx-auto w-full max-w-[90rem] px-5 pb-24 pt-14 sm:px-10 sm:pt-20 lg:px-16 lg:pt-28">
+      <div className="relative z-10 mx-auto w-full max-w-[90rem] overflow-x-clip px-5 pb-24 pt-14 sm:px-10 sm:pt-20 lg:px-16 lg:pt-28">
         <VibeResults analysis={tasteProfile} />
 
         {tasteProfile && <ProductSearch usage={usage} />}

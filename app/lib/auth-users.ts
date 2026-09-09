@@ -9,7 +9,23 @@ export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-export async function authenticatePasswordUser(credentials: Record<string, unknown> | undefined) {
+export type PasswordAuthUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  image: string | null;
+};
+
+export type PasswordAuthResult =
+  | { ok: true; user: PasswordAuthUser }
+  | {
+      ok: false;
+      reason: "invalid_input" | "account_not_found" | "incorrect_password" | "oauth_only";
+    };
+
+export async function authenticatePasswordUser(
+  credentials: Record<string, unknown> | undefined,
+): Promise<PasswordAuthResult> {
   const email = typeof credentials?.email === "string"
     ? normalizeEmail(credentials.email)
     : "";
@@ -18,7 +34,7 @@ export async function authenticatePasswordUser(credentials: Record<string, unkno
     : "";
 
   if (!emailPattern.test(email) || password.length === 0) {
-    return null;
+    return { ok: false, reason: "invalid_input" };
   }
 
   const sql = getDatabase();
@@ -36,15 +52,26 @@ export async function authenticatePasswordUser(credentials: Record<string, unkno
   }>;
   const user = rows[0];
 
-  if (!user?.password_hash || !(await compare(password, user.password_hash))) {
-    return null;
+  if (!user) {
+    return { ok: false, reason: "account_not_found" };
+  }
+
+  if (!user.password_hash) {
+    return { ok: false, reason: "oauth_only" };
+  }
+
+  if (!(await compare(password, user.password_hash))) {
+    return { ok: false, reason: "incorrect_password" };
   }
 
   return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    image: user.image,
+    ok: true,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image,
+    },
   };
 }
 

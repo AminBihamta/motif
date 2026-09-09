@@ -1,5 +1,5 @@
 import { Pool } from "@neondatabase/serverless";
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import PostgresAdapter from "@auth/pg-adapter";
@@ -9,6 +9,22 @@ import {
   markEmailVerified,
   markEmailVerifiedByEmail,
 } from "./app/lib/email-verification";
+
+class AccountNotFoundError extends CredentialsSignin {
+  code = "account_not_found";
+}
+
+class IncorrectPasswordError extends CredentialsSignin {
+  code = "incorrect_password";
+}
+
+class OauthOnlyError extends CredentialsSignin {
+  code = "oauth_only";
+}
+
+class InvalidCredentialsError extends CredentialsSignin {
+  code = "invalid_input";
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
   const connectionString = process.env.NEON_CONNECTION_STRING;
@@ -30,7 +46,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth(async () => {
           password: { label: "Password", type: "password" },
         },
         async authorize(credentials) {
-          return authenticatePasswordUser(credentials);
+          const result = await authenticatePasswordUser(credentials);
+
+          if (result.ok) {
+            return result.user;
+          }
+
+          switch (result.reason) {
+            case "account_not_found":
+              throw new AccountNotFoundError();
+            case "incorrect_password":
+              throw new IncorrectPasswordError();
+            case "oauth_only":
+              throw new OauthOnlyError();
+            default:
+              throw new InvalidCredentialsError();
+          }
         },
       }),
     ],

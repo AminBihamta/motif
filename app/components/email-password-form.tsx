@@ -13,6 +13,19 @@ import { capturePostHogEvent } from "../lib/posthog";
 
 const initialRegistrationState: RegistrationState = {};
 
+function signInErrorMessage(code?: string) {
+  switch (code) {
+    case "account_not_found":
+      return "No Motif account exists for that email.";
+    case "incorrect_password":
+      return "Incorrect password. Try again or reset it.";
+    case "oauth_only":
+      return "That email uses Google sign-in. Continue with Google above.";
+    default:
+      return "That email and password combination did not work.";
+  }
+}
+
 export default function EmailPasswordForm({
   callbackUrl,
   initialMode = "signin",
@@ -44,13 +57,15 @@ export default function EmailPasswordForm({
       redirectTo: callbackUrl,
     });
 
-    if (!result?.ok) {
-      setSignInError("That email and password combination did not work.");
+    // Auth.js returns HTTP 200 with error/code in the redirect URL on failure.
+    // Checking only `ok` previously sent users to callbackUrl unsigned-in.
+    if (result?.error || !result?.ok || !result.url) {
+      setSignInError(signInErrorMessage(result?.code));
       setPending(false);
       return;
     }
 
-    window.location.assign(result.url ?? callbackUrl);
+    window.location.assign(result.url);
   }
 
   return (
