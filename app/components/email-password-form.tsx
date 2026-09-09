@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight } from "iconoir-react";
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useActionState, useState } from "react";
 import {
@@ -80,7 +81,18 @@ export default function EmailPasswordForm({
       ) : (
         <form action={handleSignIn} className="space-y-4">
           <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em]">Email address</span><input name="email" type="email" autoComplete="email" required className="w-full border-2 border-motif-black bg-transparent px-4 py-3 font-bold outline-none focus:shadow-[5px_5px_0_var(--color-motif-red)]" placeholder="yourname@example.com" /></label>
-          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-[0.18em]">Password</span><input name="password" type="password" autoComplete="current-password" required className="w-full border-2 border-motif-black bg-transparent px-4 py-3 font-bold outline-none focus:shadow-[5px_5px_0_var(--color-motif-red)]" placeholder="Enter your password" /></label>
+          <label className="block">
+            <span className="mb-2 flex items-center justify-between gap-3 text-[10px] font-black uppercase tracking-[0.18em]">
+              <span>Password</span>
+              <Link
+                href="/forgot-password"
+                className="normal-case tracking-[0.08em] text-motif-red underline underline-offset-2"
+              >
+                Forgot password?
+              </Link>
+            </span>
+            <input name="password" type="password" autoComplete="current-password" required className="w-full border-2 border-motif-black bg-transparent px-4 py-3 font-bold outline-none focus:shadow-[5px_5px_0_var(--color-motif-red)]" placeholder="Enter your password" />
+          </label>
           {signInError && <p role="alert" className="border-l-4 border-motif-red px-3 text-sm font-bold text-motif-red">{signInError}</p>}
           <button type="submit" disabled={pending} className="group flex w-full items-center justify-between border-2 border-motif-black bg-motif-red px-5 py-4 text-sm font-black uppercase tracking-[0.14em] text-motif-ivory shadow-[6px_6px_0_var(--color-motif-blue)] transition-all hover:bg-motif-black disabled:cursor-wait disabled:opacity-60">{pending ? "Checking your archive..." : "Sign in"}<ArrowRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" /></button>
         </form>

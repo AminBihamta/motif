@@ -23,6 +23,7 @@ export default async function SignIn({
   searchParams: Promise<{
     callbackUrl?: string | string[];
     verification?: string | string[];
+    reset?: string | string[];
     mode?: string | string[];
   }>;
 }) {
@@ -41,6 +42,7 @@ export default async function SignIn({
   const verification = Array.isArray(params.verification)
     ? params.verification[0]
     : params.verification;
+  const reset = Array.isArray(params.reset) ? params.reset[0] : params.reset;
   const modeParam = Array.isArray(params.mode) ? params.mode[0] : params.mode;
   const initialMode = modeParam === "signup" ? "signup" : "signin";
 
@@ -84,6 +86,15 @@ export default async function SignIn({
                   {verification === "success"
                     ? "Email verified — your five analyses and five searches per week are ready."
                     : "That verification link is invalid or has expired. Request a new one below."}
+                </p>
+              )}
+
+              {reset === "success" && (
+                <p
+                  role="status"
+                  className="mt-5 border-l-4 border-motif-blue px-3 text-sm font-bold text-motif-charcoal"
+                >
+                  Password updated. Sign in with your new password.
                 </p>
               )}
 

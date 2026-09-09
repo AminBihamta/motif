@@ -61,6 +61,24 @@ export async function createPasswordUser(name: string, email: string, password: 
   return rows[0]?.id ?? null;
 }
 
+export async function updatePasswordHash(userId: string, password: string) {
+  if (password.length < 8 || password.length > 72) {
+    throw new Error("Use a password between 8 and 72 characters.");
+  }
+
+  const sql = getDatabase();
+  const passwordHash = await hash(password, 12);
+  const rows = await sql`
+    UPDATE public.users
+    SET password_hash = ${passwordHash}
+    WHERE id::text = ${userId}
+      AND password_hash IS NOT NULL
+    RETURNING id::text AS id
+  ` as Array<{ id: string }>;
+
+  return rows[0]?.id ?? null;
+}
+
 export function isValidEmail(email: string) {
   return emailPattern.test(normalizeEmail(email));
 }

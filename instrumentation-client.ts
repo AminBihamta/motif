@@ -10,5 +10,7 @@ initBotId({
     { path: "/my-vibe", method: "POST" },
     { path: "/contact", method: "POST" },
     { path: "/signin", method: "POST" },
+    { path: "/forgot-password", method: "POST" },
+    { path: "/reset-password", method: "POST" },
   ],
 });
