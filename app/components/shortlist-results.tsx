@@ -42,12 +42,12 @@ function ProductCard({
           source: product.source,
         })
       }
-      initial={{ opacity: 0, y: reduceMotion ? 0 : 34, rotate: 0 }}
-      whileInView={{ opacity: 1, y: 0, rotate: index % 2 === 0 ? -0.35 : 0.35 }}
-      whileHover={reduceMotion ? undefined : { y: -10, rotate: index % 2 === 0 ? -1 : 1 }}
+      initial={{ opacity: 0, y: reduceMotion ? 0 : 34 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      whileHover={reduceMotion ? undefined : { y: -8 }}
       viewport={{ once: true, amount: 0.12 }}
       transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : Math.min(index * 0.07, 0.5), ease: [0.22, 1, 0.36, 1] }}
-      className="group relative flex flex-col border-2 border-motif-black bg-motif-ivory p-3 text-motif-black shadow-[6px_6px_0_var(--color-motif-red)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory"
+      className="group relative flex min-w-0 w-full max-w-full flex-col border-2 border-motif-black bg-motif-ivory p-3 text-motif-black shadow-[4px_4px_0_var(--color-motif-red)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:shadow-[6px_6px_0_var(--color-motif-red)]"
     >
       <span className="absolute left-0 top-0 z-10 bg-motif-black px-2 py-1 text-[9px] font-black tracking-[0.16em] text-motif-ivory">
         MATCH-{String(index + 1).padStart(2, "0")}
@@ -112,17 +112,37 @@ export default function ShortlistResults({
 
       <SiteHeader priority isSignedIn={isSignedIn} />
 
-      <div className="relative z-10 mx-auto w-full max-w-[96rem] px-5 pb-24 pt-16 sm:px-10 sm:pt-24 lg:px-16 lg:pt-32">
-        <motion.div initial={{ opacity: 0, y: reduceMotion ? 0 : 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.7 }} className="grid gap-10 border-b-2 border-motif-ivory pb-12 lg:grid-cols-[1fr_22rem] lg:items-end">
-          <div>
-            <h1 className="max-w-5xl text-[4.8rem] font-black uppercase leading-[0.74] tracking-[-0.075em] sm:text-[8rem] lg:text-[10rem]">
+      <div className="relative z-10 mx-auto w-full max-w-[96rem] overflow-x-clip px-5 pb-24 pt-16 sm:px-10 sm:pt-24 lg:px-16 lg:pt-32">
+        <motion.div
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 26 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.7 }}
+          className="grid min-w-0 gap-10 border-b-2 border-motif-ivory pb-12 lg:grid-cols-[1fr_22rem] lg:items-end"
+        >
+          <div className="min-w-0">
+            <h1 className="max-w-full break-words text-[clamp(2.75rem,16vw,10rem)] font-black uppercase leading-[0.78] tracking-[-0.075em]">
               The
-              <span className="bodoniModa block font-normal italic text-motif-taupe">shortlist.</span>
+              <span className="bodoniModa block font-normal italic text-motif-taupe">
+                shortlist.
+              </span>
             </h1>
           </div>
-          <aside className="border-2 border-motif-ivory bg-motif-blue p-5 shadow-[8px_8px_0_var(--color-motif-red)] lg:rotate-2">
-            <p className="text-3xl font-black uppercase leading-[0.9]">{tasteProfile?.vibeName ?? "Unknown signal"}</p>
-            {tasteProfile && <div className="mt-5 flex flex-wrap gap-2">{tasteProfile.characteristics.slice(0, 3).map((item) => <span key={item} className="border border-motif-ivory/60 px-2 py-1 text-[9px] font-black uppercase tracking-[0.1em]">{item}</span>)}</div>}
+          <aside className="min-w-0 w-full max-w-full border-2 border-motif-ivory bg-motif-blue p-4 shadow-[6px_6px_0_var(--color-motif-red)] sm:p-5 sm:shadow-[8px_8px_0_var(--color-motif-red)] lg:rotate-2">
+            <p className="break-words text-2xl font-black uppercase leading-[0.95] sm:text-3xl sm:leading-[0.9]">
+              {tasteProfile?.vibeName ?? "Unknown signal"}
+            </p>
+            {tasteProfile ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {tasteProfile.characteristics.slice(0, 3).map((item) => (
+                  <span
+                    key={item}
+                    className="max-w-full break-words border border-motif-ivory/60 px-2 py-1 text-[9px] font-black uppercase leading-snug tracking-[0.08em]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </aside>
         </motion.div>
 
@@ -135,12 +155,21 @@ export default function ShortlistResults({
           </div>
         ) : (
           <section className="mt-16" aria-labelledby="matches-heading">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
-              <h2 id="matches-heading" className="text-5xl font-black uppercase leading-[0.8] sm:text-8xl">{products.length} matches.</h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-motif-taupe">Product catalogue from Amazon</p>
+            <div className="mb-8 flex min-w-0 flex-wrap items-end justify-between gap-5">
+              <h2
+                id="matches-heading"
+                className="max-w-full break-words text-[clamp(2.5rem,14vw,8rem)] font-black uppercase leading-[0.8]"
+              >
+                {products.length} matches.
+              </h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-motif-taupe">
+                Product catalogue from Amazon
+              </p>
             </div>
-            <div className="grid auto-rows-auto gap-6 sm:grid-cols-2 lg:auto-rows-[minmax(17rem,auto)] lg:grid-cols-4">
-              {products.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
+            <div className="grid min-w-0 auto-rows-auto gap-6 sm:grid-cols-2 lg:auto-rows-[minmax(17rem,auto)] lg:grid-cols-4">
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
             </div>
             <motion.div
               initial={{ opacity: 0, y: reduceMotion ? 0 : 30 }}
@@ -157,7 +186,7 @@ export default function ShortlistResults({
                       a longer shelf life.
                     </span>
                   </h2>
-                  <p className="mt-6 border-l-4 border-motif-red pl-4 text-base leading-7 text-motif-ivory/75 sm:text-lg lg:whitespace-nowrap">
+                  <p className="mt-6 max-w-xl border-l-4 border-motif-red pl-4 text-base leading-7 text-motif-ivory/75 sm:text-lg">
                     Create an account to save this visual DNA and keep your edits close.
                   </p>
                 </div>
