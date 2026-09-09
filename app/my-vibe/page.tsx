@@ -47,7 +47,7 @@ export default async function MyVibe() {
         <Image id="rotating-cd" src="/assets/cd.png" alt="" width={260} height={260} className="w-56 opacity-80" />
       </AmbientDecor>
 
-      <SiteHeader priority />
+      <SiteHeader priority isSignedIn={Boolean(session?.user)} />
 
       <div className="relative z-10 mx-auto w-full max-w-[90rem] px-5 pb-24 pt-14 sm:px-10 sm:pt-20 lg:px-16 lg:pt-28">
         <VibeResults analysis={tasteProfile} />

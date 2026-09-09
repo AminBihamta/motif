@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { auth } from "@/auth";
 import UploadForm from "../components/upload-form";
 import SiteFooter from "../components/site-footer";
 import SiteHeader from "../components/site-header";
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function FindMyVibe() {
+export default async function FindMyVibe() {
+  const session = await auth();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:38px_38px]" />
@@ -26,7 +29,7 @@ export default function FindMyVibe() {
         <Image src="/assets/star.png" alt="" width={240} height={240} className="w-52 -rotate-12 opacity-80" />
       </AmbientDecor>
 
-      <SiteHeader priority />
+      <SiteHeader priority isSignedIn={Boolean(session?.user)} />
 
       <div className="relative z-10 mx-auto grid min-h-[calc(100svh-4rem)] max-w-[96rem] gap-14 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-12 lg:gap-8 lg:px-12 lg:py-20">
         <Reveal className="flex flex-col justify-between lg:col-span-5">

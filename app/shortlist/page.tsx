@@ -39,7 +39,7 @@ export default async function ShortlistPage({
   if (!query) {
     return (
       <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
-        <SiteHeader priority />
+        <SiteHeader priority isSignedIn={Boolean(session?.user)} />
         <div className="flex min-h-[calc(100svh-4rem)] items-center justify-center px-6">
           <div className="max-w-xl border-2 border-motif-ivory p-8 text-center sm:p-12">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-motif-red">
@@ -63,12 +63,15 @@ export default async function ShortlistPage({
     );
   }
 
+  const isSignedIn = Boolean(session?.user);
+
   if (query.length < 2 || query.length > 80 || !tasteProfile) {
     return (
       <ShortlistResults
         query={query}
         products={[]}
         tasteProfile={tasteProfile}
+        isSignedIn={isSignedIn}
         errorMessage={
           tasteProfile
             ? "That object needs between 2 and 80 characters."
@@ -119,6 +122,7 @@ export default async function ShortlistPage({
       products={products}
       tasteProfile={tasteProfile}
       errorMessage={errorMessage}
+      isSignedIn={isSignedIn}
     />
   );
 }

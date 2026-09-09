@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
+import { auth } from "@/auth";
 import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
 
 export const SUPPORT_EMAIL = "aminbihamtawork@gmail.com";
 
-export function LegalPageShell({
+export async function LegalPageShell({
   title,
   eyebrow,
   children,
@@ -13,6 +14,8 @@ export function LegalPageShell({
   eyebrow: string;
   children: ReactNode;
 }) {
+  const session = await auth();
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
       <div
@@ -20,7 +23,7 @@ export function LegalPageShell({
         className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:38px_38px]"
       />
 
-      <SiteHeader priority />
+      <SiteHeader priority isSignedIn={Boolean(session?.user)} />
 
       <article className="relative z-10 mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
         <p className="text-[10px] font-black uppercase tracking-[0.24em] text-motif-red">

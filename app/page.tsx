@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight } from "iconoir-react";
+import { auth } from "@/auth";
 import HeroCollage from "./components/hero-collage";
 import HomepageVideoScroll from "./components/homepage-video-scroll";
 import { Reveal } from "./components/motion-elements";
@@ -185,7 +186,8 @@ function PrimaryCta({
   );
 }
 
-export default function BoldHome() {
+export default async function BoldHome() {
+  const session = await auth();
   const siteUrl = getSiteUrl().origin;
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -225,7 +227,7 @@ export default function BoldHome() {
         className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:38px_38px]"
       />
 
-      <SiteHeader priority />
+      <SiteHeader priority isSignedIn={Boolean(session?.user)} />
 
       <section className="relative z-10 min-h-[calc(100svh-4rem)] border-b-2 border-motif-ivory">
         <div className="grid min-h-[calc(100svh-4rem)] lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">

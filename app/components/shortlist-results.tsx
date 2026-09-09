@@ -19,6 +19,7 @@ type ShortlistResultsProps = {
   products: ProductSearchResult[];
   tasteProfile: ShortlistProfile | null;
   errorMessage?: string;
+  isSignedIn?: boolean;
 };
 
 function ProductCard({
@@ -100,6 +101,7 @@ export default function ShortlistResults({
   products,
   tasteProfile,
   errorMessage,
+  isSignedIn = false,
 }: ShortlistResultsProps) {
   const reduceMotion = useReducedMotion();
   const signInHref = `/signin?callbackUrl=${encodeURIComponent(`/shortlist?q=${query}`)}`;
@@ -108,7 +110,7 @@ export default function ShortlistResults({
     <main className="relative min-h-screen overflow-hidden bg-motif-black text-motif-ivory">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(232,221,200,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(232,221,200,0.08)_1px,transparent_1px)] [background-size:42px_42px]" />
 
-      <SiteHeader priority />
+      <SiteHeader priority isSignedIn={isSignedIn} />
 
       <div className="relative z-10 mx-auto w-full max-w-[96rem] px-5 pb-24 pt-16 sm:px-10 sm:pt-24 lg:px-16 lg:pt-32">
         <motion.div initial={{ opacity: 0, y: reduceMotion ? 0 : 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0 : 0.7 }} className="grid gap-10 border-b-2 border-motif-ivory pb-12 lg:grid-cols-[1fr_22rem] lg:items-end">

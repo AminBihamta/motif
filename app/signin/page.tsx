@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import AnimatedContainer from "../components/animated-container";
 import EmailPasswordForm from "../components/email-password-form";
 import GoogleSignInButton from "../components/google-sign-in-button";
@@ -24,13 +26,18 @@ export default async function SignIn({
     mode?: string | string[];
   }>;
 }) {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/find-my-vibe");
+  }
+
   const params = await searchParams;
   const callbackUrl = Array.isArray(params.callbackUrl)
     ? params.callbackUrl[0]
     : params.callbackUrl;
   const safeCallbackUrl = callbackUrl?.startsWith("/")
     ? callbackUrl
-    : "/my-vibe";
+    : "/find-my-vibe";
   const verification = Array.isArray(params.verification)
     ? params.verification[0]
     : params.verification;
