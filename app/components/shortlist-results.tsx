@@ -166,9 +166,11 @@ export default function ShortlistResults({
                 Product catalogue from Amazon
               </p>
             </div>
-            <div className="grid min-w-0 auto-rows-auto gap-6 sm:grid-cols-2 lg:auto-rows-[minmax(17rem,auto)] lg:grid-cols-4">
+            <div className="grid min-w-0 auto-rows-auto gap-6 pb-2 sm:grid-cols-2 lg:auto-rows-[minmax(17rem,auto)] lg:grid-cols-4">
               {products.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
+                <div key={product.id} className="min-w-0 pr-1 pb-1 sm:pr-1.5 sm:pb-1.5">
+                  <ProductCard product={product} index={index} />
+                </div>
               ))}
             </div>
             <motion.div
