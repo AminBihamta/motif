@@ -11,6 +11,7 @@ const DEFAULT_GA_MEASUREMENT_ID = "G-906SQMQT76";
 
 let posthogInitialized = false;
 let googleAnalyticsInitialized = false;
+let googleAnalyticsLoadFailed = false;
 
 declare global {
   interface Window {
@@ -113,6 +114,7 @@ export function initGoogleAnalyticsIfAllowed() {
   if (typeof window === "undefined") return false;
   if (!isGoogleAnalyticsConfigured()) return false;
   if (getAnalyticsConsent() !== "accepted") return false;
+  if (googleAnalyticsLoadFailed) return false;
 
   const measurementId = getGaMeasurementId();
   if (!measurementId) return false;
@@ -151,6 +153,13 @@ export function initGoogleAnalyticsIfAllowed() {
     script.id = GA_SCRIPT_ID;
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    script.crossOrigin = "anonymous";
+    script.onerror = () => {
+      googleAnalyticsInitialized = false;
+      googleAnalyticsLoadFailed = true;
+      script.remove();
+      console.warn("Google Analytics could not be loaded; continuing without analytics.");
+    };
     document.head.appendChild(script);
   }
 

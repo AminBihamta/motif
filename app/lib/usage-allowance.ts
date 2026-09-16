@@ -320,7 +320,7 @@ export async function reserveUsage(
     if (owner.userId) {
       throw new UsageAllowanceError(
         kind === "analysis"
-          ? "You have used this week’s analyses. Your allowance refreshes in up to seven days."
+          ? "You have used all five analyses for this week. Your allowance refreshes in up to seven days."
           : "You have used this week’s searches. Your allowance refreshes in up to seven days.",
         "member_exhausted",
       );
@@ -328,7 +328,7 @@ export async function reserveUsage(
 
     throw new UsageAllowanceError(
       kind === "analysis"
-        ? "You have used your free analyses. Sign in or verify your account to continue."
+        ? "You have used your free analysis. Create an account to unlock five analyses each week."
         : "You have used your free searches. Sign in or verify your account to continue.",
       "guest_exhausted",
     );

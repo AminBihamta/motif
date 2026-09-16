@@ -10,7 +10,7 @@ import { ArrowRight, Check, Upload } from "iconoir-react";
 import { analyzeImages } from "../find-my-vibe/actions";
 import type { AnalyzeImagesState } from "../lib/vibe-analysis";
 import { REQUIRED_IMAGE_COUNT } from "../lib/upload-constraints";
-import { capturePostHogEvent } from "../lib/posthog";
+import { capturePostHogEvent, capturePostHogException } from "../lib/posthog";
 
 const uploadSlots = Array.from({ length: REQUIRED_IMAGE_COUNT });
 const initialState: AnalyzeImagesState = { status: "idle" };
@@ -32,7 +32,98 @@ const loadingMessages = [
   "Almost done. Dramatic pause included...",
 ];
 
-function AllowanceInvite({ invite }: { invite: "signup" | "verify" }) {
+const uploadDraftDatabase = "motif-upload-draft";
+const uploadDraftStore = "files";
+const uploadDraftSignalKey = "motif-upload-draft-signal";
+
+function signalDraftChange() {
+  try {
+    window.localStorage.setItem(uploadDraftSignalKey, String(Date.now()));
+  } catch {
+    // IndexedDB remains usable when storage events are unavailable.
+  }
+}
+
+function openUploadDraft() {
+  if (typeof indexedDB === "undefined") return Promise.resolve<IDBDatabase | null>(null);
+
+  return new Promise<IDBDatabase | null>((resolve) => {
+    const request = indexedDB.open(uploadDraftDatabase, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(uploadDraftStore, { keyPath: "slot" });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => resolve(null);
+  });
+}
+
+async function persistDraftFile(slot: number, file: File) {
+  const database = await openUploadDraft();
+  if (!database) return;
+
+  await new Promise<void>((resolve) => {
+    const transaction = database.transaction(uploadDraftStore, "readwrite");
+    transaction.objectStore(uploadDraftStore).put({ slot, file });
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => resolve();
+  });
+  database.close();
+  signalDraftChange();
+}
+
+async function removeDraftFile(slot: number) {
+  const database = await openUploadDraft();
+  if (!database) return;
+
+  await new Promise<void>((resolve) => {
+    const transaction = database.transaction(uploadDraftStore, "readwrite");
+    transaction.objectStore(uploadDraftStore).delete(slot);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => resolve();
+  });
+  database.close();
+  signalDraftChange();
+}
+
+async function readDraftFiles() {
+  const database = await openUploadDraft();
+  if (!database) return [] as Array<{ slot: number; file: File }>;
+
+  const files = await new Promise<Array<{ slot: number; file: File }>>((resolve) => {
+    const request = database.transaction(uploadDraftStore, "readonly")
+      .objectStore(uploadDraftStore)
+      .getAll();
+    request.onsuccess = () => resolve(request.result as Array<{ slot: number; file: File }>);
+    request.onerror = () => resolve([]);
+  });
+  database.close();
+  return files;
+}
+
+async function clearDraftFiles() {
+  const database = await openUploadDraft();
+  if (!database) return;
+
+  await new Promise<void>((resolve) => {
+    const transaction = database.transaction(uploadDraftStore, "readwrite");
+    transaction.objectStore(uploadDraftStore).clear();
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => resolve();
+  });
+  database.close();
+  signalDraftChange();
+}
+
+function fileToPreview(file: File) {
+  return new Promise<string | null>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+}
+
+function AllowanceInvite({ invite }: { invite: "signup" | "verify" | "wait" }) {
   if (invite === "verify") {
     return (
       <div
@@ -53,6 +144,52 @@ function AllowanceInvite({ invite }: { invite: "signup" | "verify" }) {
           get five analyses and five product searches every week. Google
           accounts are verified automatically.
         </p>
+      </div>
+    );
+  }
+
+  if (invite === "wait") {
+    return (
+      <div
+        role="status"
+        className="mt-4 border-2 border-motif-ivory bg-motif-black p-4 sm:p-5"
+      >
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-motif-red">
+          Weekly limit reached
+        </p>
+        <p className="mt-3 text-2xl font-black uppercase leading-[0.9] tracking-[-0.04em] text-motif-ivory sm:text-3xl">
+          Five for now.
+          <span className="bodoniModa mt-1 block font-normal italic normal-case tracking-normal text-motif-taupe">
+            Come back next week.
+          </span>
+        </p>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-motif-ivory/70">
+          Your five analyses for this week are used up. Allowance refreshes on a
+          rolling seven-day window — revisit your vibe or shortlist in the
+          meantime.
+        </p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/my-vibe"
+            className="group inline-flex items-center justify-between gap-4 border-2 border-motif-black bg-motif-red px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-transform hover:-translate-y-0.5 hover:bg-motif-ivory hover:text-motif-red focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:min-w-56"
+          >
+            View my vibe
+            <ArrowRight
+              aria-hidden="true"
+              className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+            />
+          </Link>
+          <Link
+            href="/shortlist"
+            className="group inline-flex items-center justify-between gap-4 border-2 border-motif-ivory bg-transparent px-5 py-4 text-xs font-black uppercase tracking-[0.14em] text-motif-ivory transition-colors hover:bg-motif-ivory hover:text-motif-blue focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-motif-ivory sm:min-w-44"
+          >
+            Open shortlist
+            <ArrowRight
+              aria-hidden="true"
+              className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
+            />
+          </Link>
+        </div>
       </div>
     );
   }
@@ -106,14 +243,79 @@ export default function UploadForm() {
   const reduceMotion = useReducedMotion();
   const hasNavigated = useRef(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const draftChannel = useRef<BroadcastChannel | null>(null);
   const [state, formAction, pending] = useActionState(analyzeImages, initialState);
   const [previews, setPreviews] = useState<(string | null)[]>(
     Array(REQUIRED_IMAGE_COUNT).fill(null),
   );
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dropError, setDropError] = useState<string | null>(null);
+  const [blockSubmitAfterError, setBlockSubmitAfterError] = useState(false);
+  const [trackedActionState, setTrackedActionState] = useState(state);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const uploadedCount = previews.filter(Boolean).length;
+
+  if (state !== trackedActionState) {
+    setTrackedActionState(state);
+    setBlockSubmitAfterError(state.status === "error");
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function restoreDraft() {
+      const draft = await readDraftFiles();
+      if (cancelled || draft.length === 0) return;
+
+      const restoredPreviews = Array<string | null>(REQUIRED_IMAGE_COUNT).fill(null);
+
+      await Promise.all(
+        draft.map(async ({ slot, file }) => {
+          if (slot < 0 || slot >= REQUIRED_IMAGE_COUNT) return;
+          const preview = await fileToPreview(file);
+          restoredPreviews[slot] = preview;
+
+          const input = inputRefs.current[slot];
+          if (input) {
+            const transfer = new DataTransfer();
+            transfer.items.add(file);
+            input.files = transfer.files;
+          }
+        }),
+      );
+
+      if (!cancelled) {
+        setPreviews(restoredPreviews);
+      }
+    }
+
+    void restoreDraft();
+
+    const syncDraft = () => {
+      void restoreDraft();
+    };
+    window.addEventListener("storage", syncDraft);
+    if ("BroadcastChannel" in window) {
+      draftChannel.current = new BroadcastChannel(uploadDraftSignalKey);
+      draftChannel.current.addEventListener("message", syncDraft);
+    }
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("storage", syncDraft);
+      draftChannel.current?.close();
+      draftChannel.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (state.status !== "error") return;
+    capturePostHogException(new Error(state.message), {
+      flow: "taste_analysis",
+      error_kind: state.invite ? "allowance" : "analysis",
+      ...(state.invite ? { invite: state.invite } : {}),
+    });
+  }, [state]);
 
   useEffect(() => {
     if (!pending) return;
@@ -130,15 +332,25 @@ export default function UploadForm() {
   useEffect(() => {
     if (state.status !== "success" || hasNavigated.current) return;
     hasNavigated.current = true;
+    void clearDraftFiles().then(() => draftChannel.current?.postMessage({ type: "changed" }));
     router.push("/my-vibe");
   }, [router, state]);
 
   function handleFileChange(index: number, file: File | null) {
+    setBlockSubmitAfterError(false);
+    setDropError(null);
+
     if (!file) {
       setPreviews((current) => current.map((preview, i) => i === index ? null : preview));
+      void removeDraftFile(index).then(() =>
+        draftChannel.current?.postMessage({ type: "changed" }),
+      );
       return;
     }
 
+    void persistDraftFile(index, file).then(() =>
+      draftChannel.current?.postMessage({ type: "changed" }),
+    );
     const reader = new FileReader();
     reader.onload = () => {
       setPreviews((current) => current.map((preview, i) =>
@@ -334,7 +546,7 @@ export default function UploadForm() {
         })}
       </div>
 
-      <button type="submit" disabled={pending || uploadedCount !== REQUIRED_IMAGE_COUNT} className={`group relative mt-5 flex min-h-[3.75rem] w-full items-center justify-between overflow-hidden border-2 border-motif-ivory px-5 py-4 text-left text-sm font-black uppercase tracking-[0.14em] transition-all ${pending ? "cursor-wait bg-motif-black text-motif-ivory shadow-[6px_6px_0_var(--color-motif-red)]" : "bg-motif-red shadow-[6px_6px_0_var(--color-motif-blue)] hover:bg-motif-ivory hover:text-motif-red disabled:cursor-not-allowed disabled:bg-motif-black disabled:text-motif-taupe disabled:opacity-60 disabled:shadow-none"}`}>
+      <button type="submit" disabled={pending || uploadedCount !== REQUIRED_IMAGE_COUNT || blockSubmitAfterError} className={`group relative mt-5 flex min-h-[3.75rem] w-full items-center justify-between overflow-hidden border-2 border-motif-ivory px-5 py-4 text-left text-sm font-black uppercase tracking-[0.14em] transition-all ${pending ? "cursor-wait bg-motif-black text-motif-ivory shadow-[6px_6px_0_var(--color-motif-red)]" : "bg-motif-red shadow-[6px_6px_0_var(--color-motif-blue)] hover:bg-motif-ivory hover:text-motif-red disabled:cursor-not-allowed disabled:bg-motif-black disabled:text-motif-taupe disabled:opacity-60 disabled:shadow-none"}`}>
         {pending && (
           <motion.span
             aria-hidden="true"
@@ -415,16 +627,16 @@ export default function UploadForm() {
             {dropError}
           </p>
         )}
-        {state.status === "error" && state.invite && (
-          <AllowanceInvite invite={state.invite} />
-        )}
-        {state.status === "error" && !state.invite && (
+        {state.status === "error" && blockSubmitAfterError && (
           <p
             role="alert"
             className="mt-4 border-l-4 border-motif-red bg-motif-black/80 px-4 py-3 text-sm font-bold leading-6 text-motif-ivory"
           >
             {state.message}
           </p>
+        )}
+        {state.status === "error" && blockSubmitAfterError && state.invite && (
+          <AllowanceInvite invite={state.invite} />
         )}
       </div>
     </form>

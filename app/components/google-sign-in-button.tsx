@@ -11,24 +11,40 @@ export default function GoogleSignInButton({
   callbackUrl: string;
 }) {
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
 
   return (
-    <button
-      type="button"
-      disabled={pending}
-      onClick={async () => {
-        capturePostHogEvent("google_sign_in_started");
-        setPending(true);
-        await signIn("google", { callbackUrl });
-      }}
-      className="group mt-6 flex w-full items-center justify-between gap-3 border-2 border-motif-black bg-white px-4 py-4 text-sm font-black uppercase tracking-[0.1em] text-motif-black transition-all hover:-translate-y-1 hover:shadow-[5px_5px_0_var(--color-motif-blue)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-motif-red disabled:cursor-wait disabled:opacity-60 motion-reduce:transform-none"
-    >
-      <span className="flex items-center gap-3">
-        <GoogleMark />
-        {pending ? "Opening Google..." : "Continue with Google"}
-      </span>
-      <ArrowRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
-    </button>
+    <div className="mt-6">
+      <button
+        type="button"
+        disabled={pending}
+        onClick={async () => {
+          capturePostHogEvent("google_sign_in_started");
+          setPending(true);
+          setError("");
+
+          try {
+            await signIn("google", { callbackUrl });
+          } catch (signInError) {
+            console.error("Google sign-in failed:", signInError);
+            setError("Google sign-in could not start. Please try again.");
+            setPending(false);
+          }
+        }}
+        className="group flex w-full items-center justify-between gap-3 border-2 border-motif-black bg-white px-4 py-4 text-sm font-black uppercase tracking-[0.1em] text-motif-black transition-all hover:-translate-y-1 hover:shadow-[5px_5px_0_var(--color-motif-blue)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-motif-red disabled:cursor-wait disabled:opacity-60 motion-reduce:transform-none"
+      >
+        <span className="flex items-center gap-3">
+          <GoogleMark />
+          {pending ? "Opening Google..." : "Continue with Google"}
+        </span>
+        <ArrowRight aria-hidden="true" className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none" />
+      </button>
+      {error && (
+        <p role="alert" className="mt-3 border-l-4 border-motif-red px-3 text-sm font-bold text-motif-red">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

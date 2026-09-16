@@ -7,7 +7,7 @@ export type VibeAnalysis = {
   searchQuery: string;
 };
 
-export type AnalyzeImagesInvite = "signup" | "verify";
+export type AnalyzeImagesInvite = "signup" | "verify" | "wait";
 
 export type AnalyzeImagesState =
   | { status: "idle" }

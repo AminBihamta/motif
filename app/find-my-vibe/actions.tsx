@@ -30,6 +30,13 @@ import {
 const acceptedTypes = new Set(["image/jpeg", "image/png"]);
 const maxFileSize = 5 * 1024 * 1024;
 
+class AnalysisServiceError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AnalysisServiceError";
+  }
+}
+
 function inviteForAllowanceCode(
   code: UsageAllowanceErrorCode,
 ): AnalyzeImagesInvite | undefined {
@@ -39,6 +46,10 @@ function inviteForAllowanceCode(
 
   if (code === "unverified") {
     return "verify";
+  }
+
+  if (code === "member_exhausted") {
+    return "wait";
   }
 
   return undefined;
@@ -198,15 +209,17 @@ export async function analyzeImages(
       : await getOrCreateAnonymousOwnerId();
     usageReservation = await reserveUsage("analysis", { anonymousOwnerId, userId });
 
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+    let response: Response;
+    try {
+      response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
           model: OPENROUTER_MODEL,
           temperature: 0.2,
           max_tokens: 2500,
@@ -267,24 +280,45 @@ export async function analyzeImages(
               ],
             },
           ],
-        }),
-      },
-    );
+          }),
+          signal: AbortSignal.timeout(120_000),
+        },
+      );
+    } catch (error) {
+      console.error("OpenRouter request failed:", error);
+      throw new AnalysisServiceError(
+        "The AI service is unavailable right now. Please check your connection and try again.",
+      );
+    }
 
-    const responseText = await response.text();
+    let responseText: string;
+    try {
+      responseText = await response.text();
+    } catch (error) {
+      console.error("OpenRouter response could not be read:", error);
+      throw new AnalysisServiceError(
+        "The AI service response was interrupted. Please try again.",
+      );
+    }
 
     if (!response.ok) {
       console.error("OpenRouter error:", response.status, responseText);
-      await releaseUsage(usageReservation);
-      usageReservation = null;
-
-      return {
-        status: "error",
-        message: "The AI service could not analyze your images.",
-      };
+      throw new AnalysisServiceError(
+        response.status === 429
+          ? "The AI service is busy right now. Please wait a moment and try again."
+          : "The AI service could not analyze your images. Please try again.",
+      );
     }
 
-    const data = JSON.parse(responseText) as OpenRouterResponse;
+    let data: OpenRouterResponse;
+    try {
+      data = JSON.parse(responseText) as OpenRouterResponse;
+    } catch (error) {
+      console.error("OpenRouter returned invalid response JSON:", error);
+      throw new AnalysisServiceError(
+        "The AI service returned an unreadable response. Please try again.",
+      );
+    }
     const choice = data.choices?.[0];
     const content = getTextContent(choice?.message?.content);
 
@@ -295,29 +329,29 @@ export async function analyzeImages(
         refusal: choice?.message?.refusal,
         error: data.error,
       });
-      await releaseUsage(usageReservation);
-      usageReservation = null;
-
-      return {
-        status: "error",
-        message:
-          "The selected free AI model did not return an answer. Please try again.",
-      };
+      throw new AnalysisServiceError(
+        "The selected AI model did not return an answer. Please try again.",
+      );
     }
 
     const normalizedContent = content
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```$/, "")
       .trim();
-    const analysis: unknown = JSON.parse(normalizedContent);
+    let analysis: unknown;
+    try {
+      analysis = JSON.parse(normalizedContent);
+    } catch (error) {
+      console.error("OpenRouter returned invalid JSON:", error);
+      throw new AnalysisServiceError(
+        "The AI returned an unreadable result. Please try again.",
+      );
+    }
 
     if (!isVibeAnalysis(analysis)) {
-      await releaseUsage(usageReservation);
-      usageReservation = null;
-      return {
-        status: "error",
-        message: "The AI response was missing required information.",
-      };
+      throw new AnalysisServiceError(
+        "The AI response was missing required information. Please try again.",
+      );
     }
 
     const analysisRunId = randomUUID();
@@ -380,7 +414,10 @@ export async function analyzeImages(
         uploadedBlobs.map((blob) => blob.pathname),
         "taste images after a database failure",
       );
-      throw error;
+      console.error("Taste profile save failed:", error);
+      throw new AnalysisServiceError(
+        "Could not save your taste profile. Please try again.",
+      );
     }
 
     await deleteBlobs(oldBlobPathnames, "replaced taste images");
@@ -408,11 +445,17 @@ export async function analyzeImages(
       };
     }
 
-    console.error("Image analysis failed:", error);
+    if (error instanceof AnalysisServiceError) {
+      return { status: "error", message: error.message };
+    }
+
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Image analysis failed:", { name: errorName, message: errorMessage, error });
 
     return {
       status: "error",
-      message: "Something went wrong while analyzing your images.",
+      message: "Something went wrong while analyzing your images. Please try again.",
     };
   }
 }

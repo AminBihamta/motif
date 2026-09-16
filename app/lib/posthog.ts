@@ -19,3 +19,16 @@ export function capturePostHogEvent(
     posthog.capture(event, properties);
   }
 }
+
+export function capturePostHogException(
+  error: Error,
+  properties?: Record<string, boolean | number | string>,
+) {
+  if (!isPostHogConfigured()) return;
+
+  initPostHogIfAllowed();
+
+  if (isAnalyticsAllowed()) {
+    posthog.captureException(error, properties);
+  }
+}
